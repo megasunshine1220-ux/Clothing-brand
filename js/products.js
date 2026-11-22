@@ -36,3 +36,45 @@ const fabricSpecs = {
   Dresses: {fabric:"Fluid woven viscose blend or cotton (style dependent)", yarn:"Fine ring-spun yarn for a soft hand feel", weave:"Plain weave / twill weave depending on the design", feel:"Soft drape with a lightweight, flowing feel", weight:"Lightweight to medium weight", finish:"Soft-touch finish; final finish depends on production", care:"Gentle wash; dry in shade; follow the final garment care label", fit:"Designed for movement; check the size guide"},
   Bottoms: {fabric:"Cotton twill or structured denim (style dependent)", yarn:"Ring-spun cotton warp yarn; denim may use indigo-dyed warp yarn", weave:"Twill weave for diagonal texture and durability", feel:"Structured hand feel with comfortable movement", weight:"Medium weight; denim may be heavier", finish:"Garment wash / softener finish depending on style", care:"Wash inside out with similar colours; avoid harsh bleach", fit:"Regular or relaxed cut; check the size guide"}
 };
+
+
+/*
+ * Sample fabric guidance for the prototype only. These are not verified
+ * supplier specifications; replace them with the exact composition and
+ * construction data for each garment before commercial sale.
+ */
+const fabricSpecs = {
+  Tops: {
+    fabric: "Cotton poplin / cotton jersey (style dependent)",
+    yarn: "Combed cotton yarn; confirm exact count with supplier",
+    weave: "Plain weave for poplin; single jersey for knitted tees",
+    feel: "Smooth, breathable hand feel",
+    weight: "Light to medium weight; verify per style",
+    finish: "Final finish to be confirmed with manufacturer",
+    fit: "Relaxed everyday fit; consult garment measurements",
+    care: "Follow the final sewn-in care label"
+  },
+  Dresses: {
+    fabric: "Woven cotton or viscose blend (style dependent)",
+    yarn: "Exact fibre and yarn specification to be confirmed",
+    weave: "Plain weave or twill depending on the garment",
+    feel: "Soft drape; exact feel depends on fabric selection",
+    weight: "Light to medium weight; verify per style",
+    finish: "Final finish to be confirmed with manufacturer",
+    fit: "Designed for movement; consult garment measurements",
+    care: "Follow the final sewn-in care label"
+  },
+  Bottoms: {
+    fabric: "Cotton twill or denim (style dependent)",
+    yarn: "Exact yarn count and fibre blend to be confirmed",
+    weave: "Twill weave for diagonal texture",
+    feel: "Structured hand feel",
+    weight: "Medium weight; verify per style",
+    finish: "Garment wash and finish to be confirmed",
+    fit: "Regular or relaxed cut; consult garment measurements",
+    care: "Follow the final sewn-in care label"
+  }
+};
+products.forEach(product => {
+  product.quality = { ...(fabricSpecs[product.type] || fabricSpecs.Tops) };
+});
