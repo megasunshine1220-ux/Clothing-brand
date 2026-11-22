@@ -123,7 +123,9 @@ export function createShowroom(canvas, onProductSelect = () => {}, onDirectoryTo
       addBox(.16,5.7,.16,brass,wallX,2.85,z-2.9);
       addBox(.16,5.7,.16,brass,wallX,2.85,z+2.9);
       addBox(.16,.16,6,brass,wallX,5.7,z);
-      addBox(.08,5.1,2.65,glass,wallX+side*.08,2.65,z);
+      // Narrow glazed sidelights frame the opening without blocking the department entrance.
+      addBox(.08,5.1,.48,glass,wallX+side*.08,2.65,z-2.55);
+      addBox(.08,5.1,.48,glass,wallX+side*.08,2.65,z+2.55);
       const glow = new THREE.PointLight(0xffd7a7, 18, 10);
       glow.position.set(side*7.2,4.9,z); scene.add(glow);
     }
