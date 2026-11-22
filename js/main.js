@@ -63,6 +63,8 @@ window.navigateToMain = () => {
 };
 
 function choose(name) {
+  // A department change always dismisses any open product detail first.
+  closeProduct();
   const valid = ["Men", "Women", "Dresses", "Tops", "Bottoms", "Essentials"];
   if (!valid.includes(name)) return;
   entered = true;
@@ -109,7 +111,8 @@ function renderProduct() {
       .map(([label, value]) => `<div class="quality-row"><span>${label}</span><strong>${value || "To be confirmed"}</strong></div>`)
       .join("") +
     '<p class="quality-note">Illustrative demo details, not verified supplier or laboratory claims.</p>';
-  $("#modal-size").value = "";
+  $("#modal-size").value = "M";
+  $("#modal-add").textContent = "ADD TO BAG — " + money(activeProduct.price);
   $("#product-position").textContent = (productIndex + 1) + " / " + productSequence.length;
   $("#product-prev").disabled = productSequence.length < 2;
   $("#product-next").disabled = productSequence.length < 2;
@@ -262,12 +265,13 @@ function closeBag() {
 $("#bag-close").addEventListener("click", closeBag);
 $("#drawer-backdrop").addEventListener("click", closeBag);
 
+$("#modal-close").addEventListener("click", closeProduct);
 $("#product-prev").addEventListener("click", () => stepProduct(-1));
 $("#product-next").addEventListener("click", () => stepProduct(1));
 
 $("#modal-add").addEventListener("click", () => {
   const size = $("#modal-size").value;
-  if (!size) return toast("Select a size first");
+  if (!size) { toast("Please choose a size"); $("#modal-size").focus(); return; }
   cart.add(activeProduct, size);
   closeProduct();
   toast("Added to bag");
@@ -279,6 +283,8 @@ document.addEventListener("keydown", (event) => {
     closeBag();
     closeProduct();
   }
+  if ($("#product-modal").classList.contains("open") && event.key === "ArrowRight") stepProduct(1);
+  if ($("#product-modal").classList.contains("open") && event.key === "ArrowLeft") stepProduct(-1);
 });
 
 updateBag();
