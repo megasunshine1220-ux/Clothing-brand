@@ -171,7 +171,7 @@ $("#brand-home").addEventListener("click", (event) => {
 });
 
 function driveScroll(delta) {
-  if (Math.abs(delta) < 2 || $("#product-stage").classList.contains("visible")) return;
+  if (Math.abs(delta) < 2) return;
   scrollProgress = Math.max(0, Math.min(1, scrollProgress + delta / 850));
   showroom.setProgress(scrollProgress);
 
