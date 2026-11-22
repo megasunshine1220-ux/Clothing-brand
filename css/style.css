@@ -4,3 +4,14 @@
 
 /* Entrance directory: physical-looking illuminated wayfinding boards */
 .entrance-signs{position:absolute;z-index:4;right:7vw;top:50%;transform:translate(22px,-43%);width:min(310px,34vw);padding:19px 20px 12px;background:linear-gradient(135deg,#201b16ed,#100e0de8);border:1px solid #a98762;box-shadow:0 18px 55px #0009;color:#f3e8d9;opacity:0;visibility:hidden;transition:opacity .5s,transform .5s,visibility .5s;backdrop-filter:blur(8px)}.entrance-signs.visible{opacity:1;visibility:visible;transform:translate(0,-43%)}.entrance-signs>p{font-size:8px;letter-spacing:.2em;color:#c9a17f;margin:0 0 12px;padding-bottom:12px;border-bottom:1px solid #766047}.entrance-signs button{display:grid;grid-template-columns:28px 1fr 20px;align-items:center;gap:8px;width:100%;padding:13px 2px;background:none;border:0;border-bottom:1px solid #ffffff25;color:#f2e9dc;text-align:left}.entrance-signs button:last-child{border-bottom:0}.entrance-signs button span{font-size:8px;color:#b99a79}.entrance-signs button strong{font:500 18px "Playfair Display",serif;letter-spacing:.12em}.entrance-signs button i{font-style:normal;color:#c69a80}.entrance-signs button:hover{padding-left:9px;background:#ffffff0c}.site-header{position:sticky;top:0}.products-wrap{scroll-margin-top:88px}.department-boards{display:none!important}@media(max-width:700px){.entrance-signs{right:5vw;top:auto;bottom:13%;transform:translateY(15px);width:min(270px,90vw);padding:12px 16px}.entrance-signs.visible{transform:translateY(0)}.entrance-signs>p{font-size:7px;margin-bottom:6px;padding-bottom:7px}.entrance-signs button{padding:8px 2px}.entrance-signs button strong{font-size:15px}.scene-top{z-index:5}.site-header{grid-template-columns:1fr auto}.main-nav{display:flex;position:static;grid-column:1/-1;grid-row:2;overflow-x:auto;justify-content:flex-start;gap:18px;padding:9px 0;background:var(--paper)}.site-header{height:auto;min-height:64px;padding-top:8px}.main-nav a{font-size:8px;flex:0 0 auto}}
+
+/* Functional navigation and clear department/product browsing */
+.site-header{position:sticky;top:0;z-index:15}
+.main-nav a{cursor:pointer}
+#products{scroll-margin-top:105px}
+.products-heading h2{transition:opacity .2s}
+.empty-products{grid-column:1/-1;padding:55px 15px;text-align:center;color:#756d62;font-size:13px}
+.entrance-signs{z-index:6}
+.entrance-signs button{cursor:pointer}
+.entrance-signs button:focus-visible,.main-nav a:focus-visible,.filter:focus-visible{outline:2px solid #c69a80;outline-offset:4px}
+@media(max-width:600px){.site-header{position:sticky;top:0;display:grid;grid-template-columns:1fr auto;grid-template-rows:auto auto;height:auto;min-height:0;padding:10px 5vw 0}.main-nav{display:flex;position:static;grid-column:1/-1;grid-row:2;overflow-x:auto;justify-content:flex-start;gap:18px;padding:12px 0;background:var(--paper);white-space:nowrap}.main-nav a{flex:0 0 auto;font-size:8px}.products-wrap{scroll-margin-top:115px}}
