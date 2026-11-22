@@ -26,23 +26,6 @@ export const products = [
 {id:24,name:"Women's Tailored Trouser",category:"Women",type:"Bottoms",kind:"Tailored woven fabric",price:3790,badge:"AURÉ EDIT",image:photo("photo-1594633312681-425c7b97ccd1"),description:"A versatile tailored trouser with a wide-leg shape."}
 ];
 
-/*
- * These are illustrative demo specifications for the prototype, not verified supplier
- * test results or certified fibre-content claims. Replace them with manufacturer data
- * before selling real garments.
- */
-const fabricSpecs = {
-  Tops: {fabric:"Cotton poplin / cotton jersey (style dependent)", yarn:"Combed cotton yarn; compact-spun for a smoother surface", weave:"Plain weave for poplin; knitted single jersey for tees", feel:"Smooth, breathable and soft against the skin", weight:"Light to medium weight; varies by garment", finish:"Pre-washed demo finish; actual finish to be confirmed", care:"Wash inside out with similar colours; follow the final garment care label", fit:"Relaxed everyday fit; check the size guide"},
-  Dresses: {fabric:"Fluid woven viscose blend or cotton (style dependent)", yarn:"Fine ring-spun yarn for a soft hand feel", weave:"Plain weave / twill weave depending on the design", feel:"Soft drape with a lightweight, flowing feel", weight:"Lightweight to medium weight", finish:"Soft-touch finish; final finish depends on production", care:"Gentle wash; dry in shade; follow the final garment care label", fit:"Designed for movement; check the size guide"},
-  Bottoms: {fabric:"Cotton twill or structured denim (style dependent)", yarn:"Ring-spun cotton warp yarn; denim may use indigo-dyed warp yarn", weave:"Twill weave for diagonal texture and durability", feel:"Structured hand feel with comfortable movement", weight:"Medium weight; denim may be heavier", finish:"Garment wash / softener finish depending on style", care:"Wash inside out with similar colours; avoid harsh bleach", fit:"Regular or relaxed cut; check the size guide"}
-};
-
-
-/*
- * Sample fabric guidance for the prototype only. These are not verified
- * supplier specifications; replace them with the exact composition and
- * construction data for each garment before commercial sale.
- */
 const fabricSpecs = {
   Tops: {
     fabric: "Cotton poplin / cotton jersey (style dependent)",
