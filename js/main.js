@@ -25,6 +25,12 @@ function toast(message) {
 
 function showDirectory() {
   entered = true;
+  department = "All";
+  showroom.clearDepartment();
+  document.querySelectorAll("[data-department]").forEach((button) => {
+    button.classList.remove("active");
+    button.setAttribute("aria-pressed", "false");
+  });
   scrollProgress = 1;
   showroom.setProgress(1);
   $("#welcome-panel").classList.add("hidden");
@@ -163,6 +169,10 @@ document.addEventListener("click", (event) => {
 });
 
 $("#enter-shop").addEventListener("click", enter);
+$("#main-shop").addEventListener("click", () => {
+  showDirectory();
+  $("#department-title").textContent = "THE AURÉ BOUTIQUE";
+});
 
 $("#back-departments").addEventListener("click", () => {
   $("#product-stage").classList.remove("visible");
