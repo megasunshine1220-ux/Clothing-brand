@@ -188,7 +188,7 @@ export function createShowroom(canvas, onProductSelect = () => {}, onDirectoryTo
       clearcoat:0, specularIntensity:.12
     });
     const cloth=new THREE.Mesh(geometry,material);
-    cloth.position.y=.58;
+    cloth.position.y=2.14-height;
     cloth.userData.productId=product?.id;
     cloth.castShadow=true; cloth.receiveShadow=true;
     // A subtle second surface gives the hem and shoulders a textile edge.
@@ -252,7 +252,21 @@ export function createShowroom(canvas, onProductSelect = () => {}, onDirectoryTo
     addBox(.25,7.4,11.7,warmWall,d.side*17.75,3.7,cz);
     addBox(10.9,7.4,.25,plaster,cx,3.7,cz-5.85);
     addBox(10.9,7.4,.25,plaster,cx,3.7,cz+5.85);
-    addBox(10.9,.18,11.7,darkWood,cx,7.25,cz,{castShadow:false});
+    addBox(10.9,.18,11.7,plaster,cx,7.25,cz,{castShadow:false});
+    // Layered ceiling detail: recessed perimeter trim, timber acoustic slats and downlights.
+    addBox(10.65,.10,.16,brass,cx,7.12,cz-5.55,{castShadow:false});
+    addBox(10.65,.10,.16,brass,cx,7.12,cz+5.55,{castShadow:false});
+    addBox(.16,.10,11.1,brass,cx-5.25,7.12,cz,{castShadow:false});
+    addBox(.16,.10,11.1,brass,cx+5.25,7.12,cz,{castShadow:false});
+    for(let slat=0;slat<15;slat++){
+      addBox(.055,.045,5.2,oak,cx-3.5+slat*.5,7.08,cz+2.85,{castShadow:false});
+    }
+    for(const lx of [-3.6,0,3.6]) for(const lz of [-3.6,0,3.6]){
+      const downlight=new THREE.Mesh(new THREE.CylinderGeometry(.105,.105,.035,24),new THREE.MeshStandardMaterial({color:0xfff2dc,emissive:0xffdca8,emissiveIntensity:.45,roughness:.35}));
+      downlight.position.set(cx+lx,7.10,cz+lz);scene.add(downlight);
+      const downGlow=new THREE.PointLight(0xffe8cf,2.2,5);
+      downGlow.position.set(cx+lx,6.85,cz+lz);scene.add(downGlow);
+    }
     addBox(.12,6.4,.12,brass,cx-4.9,3.2,cz-5.65);
     addBox(.12,6.4,.12,brass,cx+4.9,3.2,cz-5.65);
     addBox(9.9,.12,.12,brass,cx,6.4,cz-5.65);
