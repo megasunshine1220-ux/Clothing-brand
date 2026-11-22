@@ -165,7 +165,8 @@ export function createShowroom(canvas, onProductSelect = () => {}) {
     }
     const bar = new THREE.Mesh(new THREE.CylinderGeometry(.045,.045,3.15,12),brass);
     bar.rotation.z=Math.PI/2; bar.position.y=2.45; g.add(bar);
-    colors.forEach((color,i)=>{
+    const displayColors = Array.from({length:Math.max(colors.length,items.length)},(_,i)=>colors[i%colors.length]);
+    displayColors.forEach((color,i)=>{
       const hanger = new THREE.Mesh(new THREE.TorusGeometry(.12,.014,6,18,Math.PI),brass);
       hanger.position.set(-1.25+i*.41,2.23,.02); hanger.rotation.z=Math.PI; g.add(hanger);
       const cloth = new THREE.MeshStandardMaterial({color,roughness:.94});
