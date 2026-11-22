@@ -2,110 +2,251 @@ import * as THREE from "three";
 
 export function createShowroom(canvas) {
   const scene = new THREE.Scene();
-  scene.background = new THREE.Color(0x24201b);
-  scene.fog = new THREE.Fog(0x24201b, 26, 68);
-  const camera = new THREE.PerspectiveCamera(43,1,.1,130);
-  camera.position.set(0,2.3,17);
-  const renderer = new THREE.WebGLRenderer({canvas,antialias:true});
-  renderer.setPixelRatio(Math.min(devicePixelRatio||1,2));
+  scene.background = new THREE.Color("#e9e3d9");
+  scene.fog = new THREE.Fog("#e9e3d9", 38, 105);
+
+  const camera = new THREE.PerspectiveCamera(42, 1, 0.1, 180);
+  camera.position.set(0, 2.35, 18);
+  const renderer = new THREE.WebGLRenderer({ canvas, antialias: true, powerPreference: "high-performance" });
+  renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 1.75));
   renderer.outputColorSpace = THREE.SRGBColorSpace;
   renderer.toneMapping = THREE.ACESFilmicToneMapping;
-  renderer.toneMappingExposure = 1.65;
-  scene.add(new THREE.HemisphereLight(0xffedda,0x625348,3.0));
-  const key = new THREE.DirectionalLight(0xffe2c2,4.2); key.position.set(-5,10,9); scene.add(key);
-  const fill = new THREE.DirectionalLight(0xd9e8ff,2.0); fill.position.set(7,6,1); scene.add(fill);
-  const brass = new THREE.MeshStandardMaterial({color:0xb18a60,metalness:.62,roughness:.3});
-  const stone = new THREE.MeshStandardMaterial({color:0x62564a,roughness:.8});
-  const dark = new THREE.MeshStandardMaterial({color:0x302820,roughness:.45});
-  const glass = new THREE.MeshStandardMaterial({color:0x9bafa9,metalness:.15,roughness:.15,transparent:true,opacity:.22});
-  const floor = new THREE.Mesh(new THREE.PlaneGeometry(22,70),new THREE.MeshStandardMaterial({color:0x55483c,roughness:.28,metalness:.08}));
-  floor.rotation.x=-Math.PI/2; floor.position.set(0,-.08,-15); scene.add(floor);
-  const facade = new THREE.Mesh(new THREE.BoxGeometry(14,8,.65),stone); facade.position.set(0,4,-1.3); scene.add(facade);
-  const opening = new THREE.Mesh(new THREE.BoxGeometry(5.1,6.2,.9),new THREE.MeshBasicMaterial({color:0x30271f})); opening.position.set(0,3.1,-.82); scene.add(opening);
-  for(const x of [-3.15,3.15]) { const pil=new THREE.Mesh(new THREE.BoxGeometry(.18,6.5,.25),brass); pil.position.set(x,3.25,-.65); scene.add(pil); }
-  const sign = new THREE.Mesh(new THREE.BoxGeometry(4.4,.75,.16),new THREE.MeshStandardMaterial({color:0x30251d,emissive:0x9b6137,emissiveIntensity:1.4})); sign.position.set(0,7,-.83); scene.add(sign);
-  const doors=[];
-  for(const side of [-1,1]) { const pivot=new THREE.Group(); pivot.position.set(side*2.5,0,-.55);
-    const leaf=new THREE.Mesh(new THREE.BoxGeometry(2.5,5.8,.16),brass); leaf.position.x=-side*1.25; pivot.add(leaf);
-    const pane=new THREE.Mesh(new THREE.BoxGeometry(1.85,4.7,.05),glass); pane.position.set(-side*1.25,2.95,.1); pivot.add(pane);
-    const handle=new THREE.Mesh(new THREE.CylinderGeometry(.035,.035,.65,12),brass); handle.position.set(-side*2.05,2.8,.18); pivot.add(handle);
+  renderer.toneMappingExposure = 1.18;
+  renderer.shadowMap.enabled = true;
+  renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+
+  const hemi = new THREE.HemisphereLight(0xfff7ec, 0x817365, 2.1);
+  scene.add(hemi);
+  const sun = new THREE.DirectionalLight(0xffead0, 3.0);
+  sun.position.set(-10, 17, 13);
+  sun.castShadow = true;
+  sun.shadow.mapSize.set(2048, 2048);
+  sun.shadow.camera.left = -28; sun.shadow.camera.right = 28;
+  sun.shadow.camera.top = 28; sun.shadow.camera.bottom = -55;
+  scene.add(sun);
+  const fill = new THREE.DirectionalLight(0xe7efff, 1.05);
+  fill.position.set(14, 9, -20);
+  scene.add(fill);
+
+  const makeMarble = () => {
+    const c = document.createElement("canvas"); c.width = 512; c.height = 512;
+    const ctx = c.getContext("2d");
+    const g = ctx.createLinearGradient(0, 0, 512, 512);
+    g.addColorStop(0, "#d9d2c7"); g.addColorStop(.5, "#f1ece3"); g.addColorStop(1, "#c9c0b4");
+    ctx.fillStyle = g; ctx.fillRect(0, 0, 512, 512);
+    for (let i = 0; i < 28; i++) {
+      ctx.beginPath(); ctx.moveTo(Math.random() * 512, 0);
+      ctx.bezierCurveTo(Math.random()*512, 160, Math.random()*512, 330, Math.random()*512, 512);
+      ctx.strokeStyle = i % 3 ? "rgba(130,116,99,.10)" : "rgba(255,255,255,.32)";
+      ctx.lineWidth = i % 4 === 0 ? 3 : 1; ctx.stroke();
+    }
+    const t = new THREE.CanvasTexture(c); t.colorSpace = THREE.SRGBColorSpace;
+    t.wrapS = t.wrapT = THREE.RepeatWrapping; t.repeat.set(5, 9); return t;
+  };
+  const marble = new THREE.MeshStandardMaterial({ map: makeMarble(), roughness: .25, metalness: .04 });
+  const plaster = new THREE.MeshStandardMaterial({ color: 0xe8e0d4, roughness: .88 });
+  const warmWall = new THREE.MeshStandardMaterial({ color: 0xc9b9a5, roughness: .82 });
+  const darkWood = new THREE.MeshStandardMaterial({ color: 0x49372b, roughness: .42 });
+  const oak = new THREE.MeshStandardMaterial({ color: 0x9b7654, roughness: .55 });
+  const brass = new THREE.MeshStandardMaterial({ color: 0xb18a58, metalness: .78, roughness: .24 });
+  const glass = new THREE.MeshPhysicalMaterial({ color: 0xdce8e5, metalness: .08, roughness: .08, transmission: .72, transparent: true, opacity: .34, thickness: .08 });
+  const blackMetal = new THREE.MeshStandardMaterial({ color: 0x292725, metalness: .72, roughness: .3 });
+
+  const addBox = (w,h,d,material,x,y,z,opts={}) => {
+    const m = new THREE.Mesh(new THREE.BoxGeometry(w,h,d), material);
+    m.position.set(x,y,z); m.castShadow = opts.castShadow !== false; m.receiveShadow = true;
+    scene.add(m); return m;
+  };
+  const addSign = (label, x, y, z, width=3.8) => {
+    const c = document.createElement("canvas"); c.width = 1024; c.height = 256;
+    const ctx = c.getContext("2d");
+    ctx.fillStyle = "#382b21"; ctx.fillRect(0,0,1024,256);
+    ctx.strokeStyle = "#bd9867"; ctx.lineWidth = 5; ctx.strokeRect(16,16,992,224);
+    ctx.fillStyle = "#f1e4d1"; ctx.font = "500 82px Georgia"; ctx.textAlign = "center"; ctx.textBaseline = "middle";
+    ctx.fillText(label.toUpperCase(),512,128);
+    const tex = new THREE.CanvasTexture(c); tex.colorSpace = THREE.SRGBColorSpace;
+    const panel = new THREE.Mesh(new THREE.PlaneGeometry(width, .95), new THREE.MeshStandardMaterial({ map:tex, roughness:.65, emissive:0x1b1008, emissiveIntensity:.12 }));
+    panel.position.set(x,y,z); scene.add(panel); return panel;
+  };
+
+  // Grand entrance and central gallery.
+  addBox(14.2, .22, 51, marble, 0, -.12, -21);
+  addBox(14.2, .28, 51, darkWood, 0, 7.65, -21, {castShadow:false});
+  addBox(14.2, 7.5, .45, warmWall, 0, 3.75, -46.4);
+  addBox(14.2, .24, .55, brass, 0, 7.7, -1.4, {castShadow:false});
+  // Entry portal, bronze framing and two glazed pivot doors.
+  addBox(14.2, 8, .5, warmWall, 0, 4, -1.5);
+  addBox(5.4, 6.4, .8, darkWood, 0, 3.2, -1.1);
+  for (const x of [-2.85, 2.85]) {
+    addBox(.14, 6.8, .22, brass, x, 3.4, -.55);
+    addBox(.12, 6.8, .22, brass, x*1.12, 3.4, -.55);
+  }
+  const doors = [];
+  for (const side of [-1, 1]) {
+    const pivot = new THREE.Group(); pivot.position.set(side*2.62,0,-.55);
+    const leaf = new THREE.Mesh(new THREE.BoxGeometry(2.58,6.05,.12), brass);
+    leaf.position.x = -side*1.29; pivot.add(leaf);
+    const pane = new THREE.Mesh(new THREE.BoxGeometry(2.2,5.55,.055), glass);
+    pane.position.set(-side*1.29,3.03,.09); pivot.add(pane);
+    const rail = new THREE.Mesh(new THREE.BoxGeometry(2.28,.08,.08), blackMetal);
+    rail.position.set(-side*1.29,1.05,.15); pivot.add(rail);
+    const handle = new THREE.Mesh(new THREE.CylinderGeometry(.035,.035,.78,16),brass);
+    handle.position.set(-side*2.12,2.85,.18); pivot.add(handle);
     scene.add(pivot); doors.push({pivot,side});
   }
-  for(const x of [-6.7,6.7]) { const wall=new THREE.Mesh(new THREE.BoxGeometry(.28,8,48),stone); wall.position.set(x,4,-20); scene.add(wall); }
-  const ceiling = new THREE.Mesh(new THREE.PlaneGeometry(13.3,48),new THREE.MeshStandardMaterial({color:0x4c4034,roughness:.8,side:THREE.DoubleSide})); ceiling.rotation.x=Math.PI/2; ceiling.position.set(0,7.8,-20); scene.add(ceiling);
-  const back=new THREE.Mesh(new THREE.BoxGeometry(13.5,8,.3),stone); back.position.set(0,4,-43); scene.add(back);
-  for(let z=-5;z>-42;z-=5) {
-    const frame=new THREE.Group();
-    for(const x of [-5.8,5.8]) { const post=new THREE.Mesh(new THREE.BoxGeometry(.07,6,.07),brass); post.position.set(x,3,0); frame.add(post); }
-    const top=new THREE.Mesh(new THREE.BoxGeometry(11.6,.07,.07),brass); top.position.y=6; frame.add(top); frame.position.z=z; scene.add(frame);
-    const strip=new THREE.Mesh(new THREE.BoxGeometry(4.4,.07,.22),new THREE.MeshBasicMaterial({color:0xffd9a2})); strip.position.set(0,7.25,z); scene.add(strip);
-    const spot=new THREE.SpotLight(0xffd6a1,95,17,Math.PI/5,.55,1.2); spot.position.set(0,7,z+1); spot.target.position.set(0,1.2,z-2); scene.add(spot,spot.target);
-  }
-  // Tailored mannequin forms with shaped garments, sleeves, collars, hems and realistic proportions.
-  function mannequin(x,z,color,style="dress") {
-    const group=new THREE.Group(); group.position.set(x,0,z);
-    const fabric=new THREE.MeshStandardMaterial({color,roughness:.88});
-    const skin=new THREE.MeshStandardMaterial({color:0x9f755e,roughness:.9});
-    const hair=new THREE.MeshStandardMaterial({color:0x211b18,roughness:.95});
-    const body=new THREE.Mesh(new THREE.CapsuleGeometry(.27,.78,7,18),fabric); body.position.y=2.12; group.add(body);
-    const neck=new THREE.Mesh(new THREE.CylinderGeometry(.085,.105,.22,16),skin); neck.position.y=2.72; group.add(neck);
-    const head=new THREE.Mesh(new THREE.SphereGeometry(.22,24,20),skin); head.scale.set(.88,1.12,.92); head.position.y=2.99; group.add(head);
-    const hairCap=new THREE.Mesh(new THREE.SphereGeometry(.225,20,16,0,Math.PI*2,0,Math.PI*.58),hair); hairCap.position.set(0,3.06,-.015); group.add(hairCap);
-    for(const side of [-1,1]) {
-      const sleeve=new THREE.Mesh(new THREE.CapsuleGeometry(.105,.48,5,12),fabric); sleeve.position.set(side*.38,2.22,0); sleeve.rotation.z=side*.22; group.add(sleeve);
-      const hand=new THREE.Mesh(new THREE.SphereGeometry(.09,12,10),skin); hand.position.set(side*.49,1.82,.02); group.add(hand);
+  addSign("AURÉ  ·  ATELIER OF EVERYDAY", 0, 7.05, -.72, 5.8);
+
+  // Gallery side walls are broken into real openings for six department rooms.
+  const rows = [-8, -23, -38];
+  for (const side of [-1,1]) {
+    const wallX = side*6.9;
+    const wallSegments = [[-2.1,3.8],[-15.5,8.4],[-30.5,8.4],[-44.2,3.6]];
+    for (const [z,len] of wallSegments) addBox(.32,7.5,len,plaster,wallX,3.75,z);
+    for (const z of rows) {
+      // Brass portal frame and glass side lights.
+      addBox(.16,5.7,.16,brass,wallX,2.85,z-2.9);
+      addBox(.16,5.7,.16,brass,wallX,2.85,z+2.9);
+      addBox(.16,.16,6,brass,wallX,5.7,z);
+      addBox(.08,5.1,2.65,glass,wallX+side*.08,2.65,z);
+      const glow = new THREE.PointLight(0xffd7a7, 18, 10);
+      glow.position.set(side*7.2,4.9,z); scene.add(glow);
     }
-    if(style==="dress" || style==="kurta") {
-      const bodice=new THREE.Mesh(new THREE.CylinderGeometry(.24,.34,.68,24),fabric); bodice.position.y=1.65; group.add(bodice);
-      const skirt=new THREE.Mesh(new THREE.CylinderGeometry(.29,style==="kurta"?.48:.78,style==="kurta"?1.35:1.48,32,2),fabric); skirt.position.y=style==="kurta"?0.72:1.0; group.add(skirt);
-      const belt=new THREE.Mesh(new THREE.TorusGeometry(.29,.025,8,32),brass); belt.position.y=1.95; group.add(belt);
+  }
+  addBox(.28,7.5,51,plaster,-6.9,3.75,-21);
+  addBox(.28,7.5,51,plaster,6.9,3.75,-21);
+  // Soft architectural light strips.
+  for (let z=-5; z>-45; z-=5) {
+    const strip = new THREE.Mesh(new THREE.BoxGeometry(5.2,.055,.16),new THREE.MeshBasicMaterial({color:0xffe2b9}));
+    strip.position.set(0,7.48,z); scene.add(strip);
+    const light = new THREE.RectAreaLight(0xffe3c4, 4.5, 5, 2.2);
+    light.position.set(0,7.25,z); light.rotation.x=-Math.PI/2; scene.add(light);
+  }
+
+  // A department room has a distinct entrance, floor, display walls, rails and mannequins.
+  function mannequin(x,z,color,style) {
+    const group = new THREE.Group(); group.position.set(x,0,z);
+    const skin = new THREE.MeshStandardMaterial({color:0x9b705a,roughness:.72});
+    const fabric = new THREE.MeshStandardMaterial({color,roughness:.82});
+    const hair = new THREE.MeshStandardMaterial({color:0x211b18,roughness:.95});
+    const torso = new THREE.Mesh(new THREE.CapsuleGeometry(.27,.66,8,20),fabric); torso.position.y=1.95; group.add(torso);
+    const neck = new THREE.Mesh(new THREE.CylinderGeometry(.085,.1,.2,16),skin); neck.position.y=2.48; group.add(neck);
+    const head = new THREE.Mesh(new THREE.SphereGeometry(.2,24,20),skin); head.scale.set(.9,1.12,.92); head.position.y=2.73; group.add(head);
+    const cap = new THREE.Mesh(new THREE.SphereGeometry(.207,24,16,0,Math.PI*2,0,Math.PI*.58),hair); cap.position.set(0,2.79,-.015); group.add(cap);
+    for (const s of [-1,1]) {
+      const arm = new THREE.Mesh(new THREE.CapsuleGeometry(.09,.52,6,12),fabric);
+      arm.position.set(s*.37,1.95,0); arm.rotation.z=s*.16; group.add(arm);
+      const hand = new THREE.Mesh(new THREE.SphereGeometry(.075,12,10),skin); hand.position.set(s*.43,1.57,.02); group.add(hand);
+    }
+    if (style==="dress" || style==="kurta") {
+      const skirt = new THREE.Mesh(new THREE.CylinderGeometry(.25,style==="kurta"?.42:.68,style==="kurta"?1.2:1.42,32,2),fabric);
+      skirt.position.y=style==="kurta"?.75:.88; group.add(skirt);
     } else {
-      const jacket=new THREE.Mesh(new THREE.CylinderGeometry(.3,.38,.75,24),fabric); jacket.position.y=1.75; group.add(jacket);
-      for(const side of [-1,1]) { const leg=new THREE.Mesh(new THREE.CylinderGeometry(.16,.13,1.2,18),fabric); leg.position.set(side*.18,.66,0); group.add(leg); }
+      for (const s of [-1,1]) {
+        const leg = new THREE.Mesh(new THREE.CylinderGeometry(.14,.12,1.05,20),fabric);
+        leg.position.set(s*.16,.62,0); group.add(leg);
+      }
     }
-    const stand=new THREE.Mesh(new THREE.CylinderGeometry(.48,.55,.1,24),brass); stand.position.y=.05; group.add(stand); scene.add(group); return group;
+    const base = new THREE.Mesh(new THREE.CylinderGeometry(.4,.46,.08,28),brass); base.position.y=.04; group.add(base);
+    group.traverse(o=>{if(o.isMesh){o.castShadow=true;o.receiveShadow=true;}});
+    scene.add(group);
   }
-  mannequin(-3.8,-9,0x9a5948,"dress"); mannequin(3.8,-9,0x324d5a,"trouser");
-  mannequin(-3.8,-20,0xc9b99f,"kurta"); mannequin(3.8,-20,0x5b4652,"dress");
-  mannequin(0,-31,0x667b62,"trouser");
-  function rack(x,z) {
-    const rail=new THREE.Group(); const metal=brass;
-    for(const xx of [-1.45,1.45]) { const leg=new THREE.Mesh(new THREE.CylinderGeometry(.035,.035,2.5,8),metal); leg.position.set(xx,1.25,0); rail.add(leg); }
-    const bar=new THREE.Mesh(new THREE.CylinderGeometry(.045,.045,3.1,10),metal); bar.rotation.z=Math.PI/2; bar.position.y=2.45; rail.add(bar);
-    const colors=[0x8b5547,0x263d43,0xc0aa8c,0x51404a,0x68745e,0x39312b,0xa77c61];
-    for(let j=0;j<7;j++) {
-      const hanger=new THREE.Mesh(new THREE.TorusGeometry(.12,.018,6,14,Math.PI),metal); hanger.position.set(-1.2+j*.4,2.25,.02); hanger.rotation.z=Math.PI; rail.add(hanger);
-      const garment=new THREE.Group();
-      const top=new THREE.Mesh(new THREE.BoxGeometry(.31,.52,.12),new THREE.MeshStandardMaterial({color:colors[j],roughness:.92})); top.position.y=.18; garment.add(top);
-      const hem=new THREE.Mesh(new THREE.CylinderGeometry(.12,.2,.48,12),new THREE.MeshStandardMaterial({color:colors[j],roughness:.95})); hem.position.y=-.28; garment.add(hem);
-      garment.position.set(-1.2+j*.4,1.62,.02); rail.add(garment);
+
+  function rack(x,z,colors) {
+    const g = new THREE.Group();
+    const postMat = blackMetal;
+    for (const xx of [-1.5,1.5]) {
+      const leg = new THREE.Mesh(new THREE.CylinderGeometry(.035,.045,2.45,10),postMat);
+      leg.position.set(xx,1.22,0); g.add(leg);
+      const foot = new THREE.Mesh(new THREE.CylinderGeometry(.07,.07,.05,12),brass);
+      foot.position.set(xx,.06,0); g.add(foot);
     }
-    rail.position.set(x,0,z); scene.add(rail);
+    const bar = new THREE.Mesh(new THREE.CylinderGeometry(.045,.045,3.15,12),brass);
+    bar.rotation.z=Math.PI/2; bar.position.y=2.45; g.add(bar);
+    colors.forEach((color,i)=>{
+      const hanger = new THREE.Mesh(new THREE.TorusGeometry(.12,.014,6,18,Math.PI),brass);
+      hanger.position.set(-1.25+i*.41,2.23,.02); hanger.rotation.z=Math.PI; g.add(hanger);
+      const cloth = new THREE.MeshStandardMaterial({color,roughness:.94});
+      const body = new THREE.Mesh(new THREE.BoxGeometry(.34,.62,.12),cloth);
+      body.position.set(-1.25+i*.41,1.7,.02); g.add(body);
+      const hem = new THREE.Mesh(new THREE.CylinderGeometry(.13,.2,.38,16),cloth);
+      hem.position.set(-1.25+i*.41,1.2,.02); g.add(hem);
+    });
+    g.position.set(x,0,z); g.traverse(o=>{if(o.isMesh){o.castShadow=true;o.receiveShadow=true;}}); scene.add(g);
   }
-  rack(-5,-14); rack(5,-14); rack(-5,-27); rack(5,-27);
-  // Illuminated department portals: the selected department becomes the room the camera enters.
-  const portals=[];
-  for(let i=0;i<4;i++) {
-    const x=i%2===0?-5.9:5.9, z=-10-Math.floor(i/2)*15;
-    const frame=new THREE.Group();
-    const left=new THREE.Mesh(new THREE.BoxGeometry(.12,5,.12),brass); left.position.set(-1.25,2.5,0); frame.add(left);
-    const right=left.clone(); right.position.x=1.25; frame.add(right);
-    const top=new THREE.Mesh(new THREE.BoxGeometry(2.6,.12,.12),brass); top.position.y=5; frame.add(top);
-    const glow=new THREE.PointLight(0xffd29b,32,9); glow.position.set(0,4.3,.4); frame.add(glow);
-    frame.position.set(x,0,z); scene.add(frame); portals.push(frame);
+
+  const departments = {
+    Men: {side:-1,z:-8,colors:[0x273d48,0x8d6b4c,0x33302d,0x9a8c79,0x53635b,0xddd2c0,0x5d4640],styles:["trouser","kurta"]},
+    Women: {side:1,z:-8,colors:[0x8c514b,0xc7a58d,0x51404c,0xd8c8b2,0x647267,0x9d735e,0x343a3d],styles:["dress","dress"]},
+    Dresses: {side:1,z:-23,colors:[0x9b5c58,0xcbb49c,0x4c4857,0x697b69,0xd7cbb8,0x765b49,0x393b43],styles:["dress","dress"]},
+    Tops: {side:-1,z:-23,colors:[0x31434a,0xb38b6b,0xeee2d0,0x65504a,0x79836e,0x3c3935,0xa76e59],styles:["trouser","kurta"]},
+    Bottoms: {side:-1,z:-38,colors:[0x293c4b,0x6c6b67,0x9a8067,0x343434,0x8a8c7d,0x4d4140,0xc5b7a2],styles:["trouser","trouser"]},
+    Essentials: {side:1,z:-38,colors:[0xeee5d8,0x30383a,0x9a8d7b,0x6b786d,0x8b5549,0x3a3531,0xc3b29b],styles:["trouser","kurta"]}
+  };
+  for (const [name,d] of Object.entries(departments)) {
+    const cx=d.side*12.35, cz=d.z;
+    // Boutique room envelope and its own warm wood feature wall.
+    addBox(10.9,.2,11.7,marble,cx,-.1,cz);
+    addBox(.25,7.4,11.7,warmWall,d.side*17.75,3.7,cz);
+    addBox(10.9,7.4,.25,plaster,cx,3.7,cz-5.85);
+    addBox(10.9,7.4,.25,plaster,cx,3.7,cz+5.85);
+    addBox(10.9,.18,11.7,darkWood,cx,7.25,cz,{castShadow:false});
+    addBox(.12,6.4,.12,brass,cx-4.9,3.2,cz-5.65);
+    addBox(.12,6.4,.12,brass,cx+4.9,3.2,cz-5.65);
+    addBox(9.9,.12,.12,brass,cx,6.4,cz-5.65);
+    addSign(name+"  COLLECTION",cx,5.55,cz-5.48,4.7);
+    // Timber display plinths and illuminated shelving.
+    for (const xx of [-4.1,4.1]) {
+      addBox(1.35,.18,1.25,oak,cx+xx,.5,cz-3.5);
+      addBox(1.25,.07,1.15,brass,cx+xx,.64,cz-3.5);
+      addBox(.08,3.5,.08,brass,cx+xx,2.35,cz+4.75);
+      addBox(1.9,.08,.28,oak,cx+xx,3.8,cz+4.65);
+      const lamp=new THREE.PointLight(0xffd7a4,8,5); lamp.position.set(cx+xx,3.7,cz+3.8); scene.add(lamp);
+    }
+    rack(cx-2.6,cz-1.25,d.colors);
+    rack(cx+2.6,cz+1.65,d.colors.slice().reverse());
+    mannequin(cx-1.6,cz+3.15,d.colors[0],d.styles[0]);
+    mannequin(cx+1.7,cz-3.3,d.colors[2],d.styles[1]);
+    const spot=new THREE.SpotLight(0xffe2c0,65,17,Math.PI/4,.5,1);
+    spot.position.set(cx,6.8,cz); spot.target.position.set(cx,1,cz); scene.add(spot,spot.target);
   }
-  const resize=()=>{const w=canvas.clientWidth||innerWidth,h=canvas.clientHeight||innerHeight;renderer.setSize(w,h,false);camera.aspect=w/h;camera.updateProjectionMatrix();};
+
+  const resize=()=>{
+    const w=canvas.clientWidth||window.innerWidth, h=canvas.clientHeight||window.innerHeight;
+    renderer.setSize(w,h,false); camera.aspect=w/h; camera.updateProjectionMatrix();
+  };
   window.addEventListener("resize",resize); resize();
-  let target=0,current=0,frame=0,roomX=0,roomTargetX=0;
-  const setProgress=v=>target=THREE.MathUtils.clamp(v,0,1);
-  const setDepartment=name=>{const map={Men:-2.6,Women:2.6,Dresses:3.3,Tops:-3.2,Bottoms:-2.8,Essentials:0};roomTargetX=map[name]??0;};
+
+  let progress=0, progressTarget=0, roomX=0, roomZ=18, roomTargetX=0, roomTargetZ=18;
+  let activeDepartment=null, raf=0;
+  const setProgress=v=>{progressTarget=THREE.MathUtils.clamp(v,0,1);};
+  const setDepartment=name=>{
+    const d=departments[name]; if(!d)return;
+    activeDepartment=name;
+    roomTargetX=d.side*11.2;
+    roomTargetZ=d.z+3.5;
+  };
+  const clearDepartment=()=>{activeDepartment=null;roomTargetX=0;roomTargetZ=-5;};
   const animate=()=>{
-    frame=requestAnimationFrame(animate); current=THREE.MathUtils.damp(current,target,3.4,1/60); roomX=THREE.MathUtils.damp(roomX,roomTargetX,2.8,1/60);
-    const open=THREE.MathUtils.smoothstep(current,.08,.34); doors.forEach(({pivot,side})=>pivot.rotation.y=side*open*1.18);
-    const baseZ=17-current*34;
-    camera.position.set(roomX,2.3-current*.15,baseZ);
-    camera.lookAt(roomX*.72,2.25,-3-current*9);
+    raf=requestAnimationFrame(animate);
+    progress=THREE.MathUtils.damp(progress,progressTarget,3.2,1/60);
+    roomX=THREE.MathUtils.damp(roomX,roomTargetX,2.4,1/60);
+    roomZ=THREE.MathUtils.damp(roomZ,roomTargetZ,2.4,1/60);
+    const doorOpen=THREE.MathUtils.smoothstep(progress,.04,.42);
+    doors.forEach(({pivot,side})=>{pivot.rotation.y=side*doorOpen*1.16;});
+    const corridorZ=18-progress*22;
+    const targetX=activeDepartment?roomX:0;
+    const targetZ=activeDepartment?roomZ:corridorZ;
+    camera.position.x=THREE.MathUtils.damp(camera.position.x,targetX,2.8,1/60);
+    camera.position.y=THREE.MathUtils.damp(camera.position.y,2.35,3,1/60);
+    camera.position.z=THREE.MathUtils.damp(camera.position.z,targetZ,2.8,1/60);
+    camera.lookAt(activeDepartment?roomX:0,2.1,activeDepartment?roomZ-4:corridorZ-8);
     renderer.render(scene,camera);
-  }; animate();
-  return {setProgress,setDepartment,destroy(){cancelAnimationFrame(frame);window.removeEventListener("resize",resize);renderer.dispose();}};
+  };
+  animate();
+  return {
+    setProgress,
+    setDepartment,
+    clearDepartment,
+    destroy(){cancelAnimationFrame(raf);window.removeEventListener("resize",resize);renderer.dispose();}
+  };
 }
