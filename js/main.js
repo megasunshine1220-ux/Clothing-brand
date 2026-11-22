@@ -23,7 +23,9 @@ function toast(message) {
   toastTimer = setTimeout(() => $("#toast").classList.remove("show"), 2200);
 }
 
-function showFloorDirectory(visible) { const panel=$("#floor-directory"); panel.classList.toggle("visible",visible); panel.setAttribute("aria-hidden",visible?"false":"true"); }\n\nfunction showDirectory() {
+function showFloorDirectory(visible) { const panel=$("#floor-directory"); panel.classList.toggle("visible",visible); panel.setAttribute("aria-hidden",visible?"false":"true"); }
+
+function showDirectory() {
   entered = true;
   department = "All";
   document.querySelectorAll("[data-department]").forEach(button => {
@@ -60,7 +62,8 @@ function choose(name) {
     button.setAttribute("aria-pressed", button.dataset.department === name ? "true" : "false");
   });
   showroom.setProgress(1);
-  showFloorDirectory(false);\n  showroom.setDepartment(name);
+  showFloorDirectory(false);
+  showroom.setDepartment(name);
 }
 
 function openProduct(id) {
