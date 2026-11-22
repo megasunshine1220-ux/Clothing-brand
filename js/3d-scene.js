@@ -1,7 +1,7 @@
 import * as THREE from "three";
 import { products } from "./products.js";
 
-export function createShowroom(canvas, onProductSelect = () => {}) {
+export function createShowroom(canvas, onProductSelect = () => {}, onDirectoryToggle = () => {}) {
   const scene = new THREE.Scene();
   scene.background = new THREE.Color("#e9e3d9");
   scene.fog = new THREE.Fog("#e9e3d9", 38, 105);
@@ -247,7 +247,7 @@ export function createShowroom(canvas, onProductSelect = () => {}) {
   const child=mannequin(2.05,-43.35,0xb59a70,"dress");
   child.scale.set(.68,.68,.68);
 
-  const raycaster = new THREE.Raycaster();
+  const arrowMat = new THREE.MeshStandardMaterial({color:0xc49a69,metalness:.72,roughness:.22,emissive:0x68421c,emissiveIntensity:.45});\n  const floorArrow = new THREE.Group();\n  const arrowShaft = new THREE.Mesh(new THREE.BoxGeometry(.22,.035,1.35),arrowMat); arrowShaft.position.set(0,.035,0); floorArrow.add(arrowShaft);\n  const arrowHead = new THREE.Mesh(new THREE.ConeGeometry(.42,.78,4),arrowMat); arrowHead.rotation.x=-Math.PI/2; arrowHead.position.set(0,.055,-.78); floorArrow.add(arrowHead);\n  floorArrow.position.set(0,0,-8.4); scene.add(floorArrow);\n\n  const raycaster = new THREE.Raycaster();
   const pointer = new THREE.Vector2();
   const clickable = [];
   scene.traverse(object => { if (object.isMesh && object.userData.productId) clickable.push(object); });
@@ -269,7 +269,7 @@ export function createShowroom(canvas, onProductSelect = () => {}) {
   window.addEventListener("resize",resize); resize();
 
   let progress=0, progressTarget=0, roomX=0, roomZ=18, roomTargetX=0, roomTargetZ=18;
-  let activeDepartment=null, raf=0;
+  let activeDepartment=null, raf=0, directoryVisible=false;
   const setProgress=v=>{progressTarget=THREE.MathUtils.clamp(v,0,1);};
   const setDepartment=name=>{
     const d=departments[name]; if(!d)return;
@@ -293,13 +293,13 @@ export function createShowroom(canvas, onProductSelect = () => {}) {
     camera.position.y=THREE.MathUtils.damp(camera.position.y,2.35,3,1/60);
     camera.position.z=THREE.MathUtils.damp(camera.position.z,targetZ,5.0,1/60);
     camera.lookAt(activeDepartment?roomX:0,2.1,activeDepartment?roomZ-4.5:corridorZ-8);
-    renderer.render(scene,camera);
+    const nearArrow=!activeDepartment && progress>.72 && Math.abs(camera.position.z-floorArrow.position.z)<5.8;\n    if(nearArrow!==directoryVisible){directoryVisible=nearArrow;onDirectoryToggle(nearArrow);}\n    renderer.render(scene,camera);
   };
   animate();
   return {
     setProgress,
     setDepartment,
     clearDepartment,
-    destroy(){cancelAnimationFrame(raf);window.removeEventListener("resize",resize);canvas.removeEventListener("click",onCanvasClick);renderer.dispose();}
+    destroy(){onDirectoryToggle(false);cancelAnimationFrame(raf);window.removeEventListener("resize",resize);canvas.removeEventListener("click",onCanvasClick);renderer.dispose();}
   };
 }
