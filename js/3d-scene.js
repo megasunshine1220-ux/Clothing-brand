@@ -200,7 +200,7 @@ export function createShowroom(canvas) {
     const portraitMaterial = new THREE.MeshStandardMaterial({color:0xe8dfd3,roughness:.8});
     const portrait = new THREE.Mesh(new THREE.PlaneGeometry(2.55,3.35),portraitMaterial);
     portrait.position.set(cx,3.35,cz-5.66); scene.add(portrait);
-    addBox(2.72,3.52,.10,brass,cx,3.35,cz-5.76,{castShadow:false});
+    addBox(2.72,3.52,.10,brass,cx,3.35,cz-5.54,{castShadow:false});
     const portraitLoader = new THREE.TextureLoader();
     portraitLoader.setCrossOrigin("anonymous");
     portraitLoader.load(campaignUrl,texture=>{
