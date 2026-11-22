@@ -26,7 +26,7 @@ function toast(message) {
 function showDirectory() {
   entered = true;
   department = "All";
-  showroom.clearDepartment();
+  try { showroom.clearDepartment(); } catch (error) { console.error("3D reset failed:", error); }
   document.querySelectorAll("[data-department]").forEach((button) => {
     button.classList.remove("active");
     button.setAttribute("aria-pressed", "false");
