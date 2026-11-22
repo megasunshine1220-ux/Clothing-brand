@@ -109,3 +109,18 @@
  .modal-details{height:60dvh!important;max-height:60dvh!important;padding-bottom:28px!important}
  #modal-add{position:sticky;bottom:0}
 }
+
+
+/* AURÉ retail finish: consistent product price hierarchy, stocked display styling and focus states. */
+.pricing-note{display:block!important;margin-top:5px;color:#8a8176;font-size:9px;font-weight:400;line-height:1.5}
+#modal-price{display:block!important}
+#modal-price .sale-price{display:block;font-size:24px;letter-spacing:.01em}
+#modal-add{position:sticky;bottom:0;z-index:3;box-shadow:0 -10px 20px #fff}
+#bag-open:focus-visible,#bag-close:focus-visible,#modal-close:focus-visible,#modal-add:focus-visible,
+#product-prev:focus-visible,#product-next:focus-visible,.floor-directory-grid button:focus-visible{
+ outline:2px solid #b18a58;outline-offset:3px
+}
+@media(max-width:760px){
+ .modal-details{padding-bottom:28px!important}
+ #modal-add{margin-top:14px}
+}
