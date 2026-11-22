@@ -106,7 +106,9 @@ export function createShowroom(canvas, onProductSelect = () => {}, onDirectoryTo
     handle.position.set(-side*2.12,2.95,.18); pivot.add(handle);
     scene.add(pivot); doors.push({pivot,side});
   }
-  // Brass threshold makes the entrance visible from the exterior approach.\n  addBox(5.5,.12,.72,brass,0,.02,-1.05,{castShadow:false});\n  // Clear, front-facing brand fascia above the entrance.
+  // Brass threshold makes the entrance visible from the exterior approach.
+  addBox(5.5,.12,.72,brass,0,.02,-1.05,{castShadow:false});
+  // Clear, front-facing brand fascia above the entrance.
   addSign("AURÉ", 0, 7.05, -.42, 6.8);
   addSign("ATELIER OF EVERYDAY", 0, 6.48, -.42, 4.8);
 
@@ -270,7 +272,13 @@ export function createShowroom(canvas, onProductSelect = () => {}, onDirectoryTo
   const child=mannequin(2.05,-43.35,0xb59a70,"dress");
   child.scale.set(.68,.68,.68);
 
-  const arrowMat = new THREE.MeshStandardMaterial({color:0xc49a69,metalness:.72,roughness:.22,emissive:0x68421c,emissiveIntensity:.45});\n  const floorArrow = new THREE.Group();\n  const arrowShaft = new THREE.Mesh(new THREE.BoxGeometry(.22,.035,1.35),arrowMat); arrowShaft.position.set(0,.035,0); floorArrow.add(arrowShaft);\n  const arrowHead = new THREE.Mesh(new THREE.ConeGeometry(.42,.78,4),arrowMat); arrowHead.rotation.x=-Math.PI/2; arrowHead.position.set(0,.055,-.78); floorArrow.add(arrowHead);\n  floorArrow.position.set(0,0,-8.4); scene.add(floorArrow);\n\n  const raycaster = new THREE.Raycaster();
+  const arrowMat = new THREE.MeshStandardMaterial({color:0xc49a69,metalness:.72,roughness:.22,emissive:0x68421c,emissiveIntensity:.45});
+  const floorArrow = new THREE.Group();
+  const arrowShaft = new THREE.Mesh(new THREE.BoxGeometry(.22,.035,1.35),arrowMat); arrowShaft.position.set(0,.035,0); floorArrow.add(arrowShaft);
+  const arrowHead = new THREE.Mesh(new THREE.ConeGeometry(.42,.78,4),arrowMat); arrowHead.rotation.x=-Math.PI/2; arrowHead.position.set(0,.055,-.78); floorArrow.add(arrowHead);
+  floorArrow.position.set(0,0,-8.4); scene.add(floorArrow);
+
+  const raycaster = new THREE.Raycaster();
   const pointer = new THREE.Vector2();
   const clickable = [];
   scene.traverse(object => { if (object.isMesh && object.userData.productId) clickable.push(object); });
@@ -316,7 +324,9 @@ export function createShowroom(canvas, onProductSelect = () => {}, onDirectoryTo
     camera.position.y=THREE.MathUtils.damp(camera.position.y,2.35,3,1/60);
     camera.position.z=THREE.MathUtils.damp(camera.position.z,targetZ,5.0,1/60);
     camera.lookAt(activeDepartment?roomX:0,2.1,activeDepartment?roomZ-4.5:corridorZ-8);
-    const nearArrow=!activeDepartment && progress>.72 && Math.abs(camera.position.z-floorArrow.position.z)<5.8;\n    if(nearArrow!==directoryVisible){directoryVisible=nearArrow;onDirectoryToggle(nearArrow);}\n    renderer.render(scene,camera);
+    const nearArrow=!activeDepartment && progress>.72 && Math.abs(camera.position.z-floorArrow.position.z)<5.8;
+    if(nearArrow!==directoryVisible){directoryVisible=nearArrow;onDirectoryToggle(nearArrow);}
+    renderer.render(scene,camera);
   };
   animate();
   return {
