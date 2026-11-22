@@ -23,3 +23,25 @@
 .floor-directory-grid button:hover,.floor-directory-grid button.active{background:#e9d8c2;border-color:#a67d50}
 .floor-directory-grid button span{color:#a67d50}
 @media(max-width:600px){.floor-directory{bottom:7vh;padding:13px}.floor-directory-grid{grid-template-columns:repeat(2,1fr)}.floor-directory-grid button{padding:12px 9px;font-size:11px}}
+
+
+/* Persistent department navigation */
+.immersive-header{grid-template-columns:auto minmax(0,1fr) auto;gap:clamp(12px,2vw,30px)}
+.main-nav{min-width:0;display:flex;align-items:center;justify-content:center;gap:clamp(9px,1.25vw,20px);overflow-x:auto;scrollbar-width:none}
+.main-nav::-webkit-scrollbar{display:none}
+.main-nav button{flex:0 0 auto;font-size:clamp(7px,.68vw,9px);padding:12px 0;cursor:pointer}
+.main-nav button[aria-pressed="true"]{color:#d9b68e}
+.main-nav #main-shop{flex:0 0 auto}
+@media(max-width:850px){
+ .immersive-header{grid-template-columns:auto minmax(0,1fr) auto;gap:10px}
+ .main-nav{justify-content:flex-start;gap:13px}
+ .main-nav button{font-size:7px}
+}
+@media(max-width:600px){
+ .immersive-header{grid-template-columns:auto minmax(0,1fr) auto}
+ .main-nav{position:static;left:auto;right:auto;top:auto;padding:0;background:transparent;overflow-x:auto;justify-content:flex-start;gap:13px}
+ .main-nav button{font-size:7px;padding:12px 0}
+ .brand span{display:none}
+}
+/* Garments are modeled geometry, not image planes. Give them enough visual contrast. */
+#showroom-canvas{background:#e9e3d9}
