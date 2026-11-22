@@ -166,8 +166,60 @@ export function createShowroom(canvas, onProductSelect = () => {}, onDirectoryTo
     return group;
   }
 
-  const photoLoader = new THREE.TextureLoader();
-  photoLoader.setCrossOrigin("anonymous");
+  // Real, volumetric garment meshes: shaped panels with thickness and soft pleat ribs.
+  function garmentShape(kind) {
+    const shape = new THREE.Shape();
+    if (kind === "trouser") {
+      shape.moveTo(-.31,1.22); shape.lineTo(-.30,.78); shape.lineTo(-.13,.08);
+      shape.lineTo(-.02,.08); shape.lineTo(.02,.72); shape.lineTo(.13,.08);
+      shape.lineTo(.31,.08); shape.lineTo(.30,.78); shape.lineTo(.31,1.22);
+      shape.lineTo(-.31,1.22);
+    } else if (kind === "dress" || kind === "kurta") {
+      shape.moveTo(-.24,1.25); shape.lineTo(-.42,.72); shape.lineTo(-.58,.05);
+      shape.lineTo(.58,.05); shape.lineTo(.42,.72); shape.lineTo(.24,1.25);
+      shape.lineTo(.14,1.34); shape.lineTo(-.14,1.34); shape.closePath();
+    } else {
+      shape.moveTo(-.20,1.30); shape.lineTo(-.48,1.18); shape.lineTo(-.62,.72);
+      shape.lineTo(-.48,.66); shape.lineTo(-.32,1.00); shape.lineTo(-.30,.08);
+      shape.lineTo(.30,.08); shape.lineTo(.32,1.00); shape.lineTo(.48,.66);
+      shape.lineTo(.62,.72); shape.lineTo(.48,1.18); shape.lineTo(.20,1.30);
+      shape.lineTo(.12,1.37); shape.lineTo(-.12,1.37); shape.closePath();
+    }
+    return shape;
+  }
+  function makeGarment(kind, color, product) {
+    const material = new THREE.MeshPhysicalMaterial({
+      color, roughness:.88, metalness:0, side:THREE.DoubleSide,
+      sheen:0.55, sheenRoughness:.9, clearcoat:.04
+    });
+    const geometry = new THREE.ExtrudeGeometry(garmentShape(kind), {
+      depth:.075, bevelEnabled:true, bevelSegments:2, steps:1,
+      bevelSize:.025, bevelThickness:.025, curveSegments:10
+    });
+    geometry.translate(0,0,-.0375);
+    const cloth = new THREE.Mesh(geometry,material);
+    cloth.position.y=.73;
+    cloth.userData.productId=product?.id;
+    cloth.castShadow=true; cloth.receiveShadow=true;
+    const details = new THREE.Group();
+    // Raised seam lines and natural-looking folds make the cloth read as a 3D object.
+    const seamMat = new THREE.MeshStandardMaterial({color:new THREE.Color(color).multiplyScalar(.72),roughness:.95});
+    const foldCount = kind==="trouser" ? 3 : 4;
+    for(let n=0;n<foldCount;n++){
+      const x=-.19+n*(.38/Math.max(1,foldCount-1));
+      const points=[new THREE.Vector3(x,1.17,.045),new THREE.Vector3(x*.82,.78,.065),new THREE.Vector3(x*.72,.18,.045)];
+      const curve=new THREE.CatmullRomCurve3(points);
+      const rib=new THREE.Mesh(new THREE.TubeGeometry(curve,12,.009,5,false),seamMat);
+      details.add(rib);
+    }
+    if(kind!=="trouser"){
+      const collar=new THREE.Mesh(new THREE.TorusGeometry(.105,.018,6,18,Math.PI),seamMat);
+      collar.position.set(0,2.03,.045); collar.rotation.z=Math.PI; details.add(collar);
+    }
+    details.position.y=0;
+    cloth.add(details);
+    return cloth;
+  }
   function rack(x,z,colors,items=[]) {
     const g = new THREE.Group();
     for (const xx of [-1.5,1.5]) {
@@ -181,24 +233,24 @@ export function createShowroom(canvas, onProductSelect = () => {}, onDirectoryTo
     const count=Math.max(colors.length,items.length);
     for(let i=0;i<count;i++){
       const xPos=-1.25+i*.41;
-      const hanger=new THREE.Mesh(new THREE.TorusGeometry(.12,.014,6,18,Math.PI),brass);
-      hanger.position.set(xPos,2.23,.02); hanger.rotation.z=Math.PI; g.add(hanger);
+      const hangerGroup=new THREE.Group();
+      const hook=new THREE.Mesh(new THREE.TorusGeometry(.075,.012,6,16,Math.PI),brass);
+      hook.rotation.z=Math.PI; hook.position.y=.16; hangerGroup.add(hook);
+      const hangerShape=new THREE.Shape();
+      hangerShape.moveTo(-.19,.04); hangerShape.lineTo(0,-.12); hangerShape.lineTo(.19,.04);
+      const hangerWire=new THREE.Mesh(new THREE.TubeGeometry(new THREE.LineCurve3(new THREE.Vector3(-.19,.04,0),new THREE.Vector3(.19,.04,0)),1,.014,6),oak);
+      hangerGroup.add(hangerWire);
+      const left=new THREE.Mesh(new THREE.CylinderGeometry(.012,.012,.24,6),oak);
+      left.position.set(-.095,-.02,0);left.rotation.z=-.9;hangerGroup.add(left);
+      const right=left.clone();right.position.x=.095;right.rotation.z=.9;hangerGroup.add(right);
+      hangerGroup.position.set(xPos,2.18,.02);g.add(hangerGroup);
       const product=items.length?items[i%items.length]:null;
-      if(product){
-        const photoMaterial=new THREE.MeshStandardMaterial({color:0xffffff,roughness:.9});
-        const photoCard=new THREE.Mesh(new THREE.PlaneGeometry(.43,.92),photoMaterial);
-        photoCard.position.set(xPos,1.65,.055);
-        photoCard.userData.productId=product.id;
-        g.add(photoCard);
-        photoLoader.load(product.image,texture=>{
-          texture.colorSpace=THREE.SRGBColorSpace;
-          photoCard.material.map=texture;
-          photoCard.material.needsUpdate=true;
-        },undefined,()=>{});
-      } else {
-        const fallback=new THREE.Mesh(new THREE.PlaneGeometry(.43,.92),new THREE.MeshStandardMaterial({color:colors[i%colors.length]}));
-        fallback.position.set(xPos,1.65,.055);g.add(fallback);
-      }
+      const kind=product?.type==="Bottoms"?"trouser":
+        product?.name?.toLowerCase().includes("kurta")?"kurta":
+        product?.type==="Dresses"?"dress":"top";
+      const cloth=makeGarment(kind,colors[i%colors.length],product);
+      cloth.position.x=xPos;
+      g.add(cloth);
     }
     g.position.set(x,0,z);
     g.traverse(o=>{if(o.isMesh){o.castShadow=true;o.receiveShadow=true;}});
