@@ -253,7 +253,7 @@ export function createShowroom(canvas) {
     activeDepartment=name;
     // Move through the corresponding side opening and settle inside the room.
     roomTargetX=d.side*12.0;
-    roomTargetZ=d.z+4.0;
+    roomTargetZ=d.z+2.5;
   };
   const clearDepartment=()=>{activeDepartment=null;roomTargetX=0;roomTargetZ=-5;};
   const animate=()=>{
@@ -269,7 +269,7 @@ export function createShowroom(canvas) {
     camera.position.x=THREE.MathUtils.damp(camera.position.x,targetX,5.0,1/60);
     camera.position.y=THREE.MathUtils.damp(camera.position.y,2.35,3,1/60);
     camera.position.z=THREE.MathUtils.damp(camera.position.z,targetZ,5.0,1/60);
-    camera.lookAt(activeDepartment?roomX:0,2.1,activeDepartment?roomZ-5.2:corridorZ-8);
+    camera.lookAt(activeDepartment?roomX:0,2.1,activeDepartment?roomZ-4.5:corridorZ-8);
     renderer.render(scene,camera);
   };
   animate();
