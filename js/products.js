@@ -36,10 +36,3 @@ const fabricSpecs = {
   Dresses: {fabric:"Fluid woven viscose blend or cotton (style dependent)", yarn:"Fine ring-spun yarn for a soft hand feel", weave:"Plain weave / twill weave depending on the design", feel:"Soft drape with a lightweight, flowing feel", weight:"Lightweight to medium weight", finish:"Soft-touch finish; final finish depends on production", care:"Gentle wash; dry in shade; follow the final garment care label", fit:"Designed for movement; check the size guide"},
   Bottoms: {fabric:"Cotton twill or structured denim (style dependent)", yarn:"Ring-spun cotton warp yarn; denim may use indigo-dyed warp yarn", weave:"Twill weave for diagonal texture and durability", feel:"Structured hand feel with comfortable movement", weight:"Medium weight; denim may be heavier", finish:"Garment wash / softener finish depending on style", care:"Wash inside out with similar colours; avoid harsh bleach", fit:"Regular or relaxed cut; check the size guide"}
 };
-products.forEach(product => {
-  // Prototype-only offer values; replace with approved retail pricing before launch.
-  product.discountPercent = 20;
-  product.mrp = Math.round(product.price / (1 - product.discountPercent / 100));
-  const spec = fabricSpecs[product.type] || fabricSpecs.Tops;
-  product.quality = {...spec};
-});
