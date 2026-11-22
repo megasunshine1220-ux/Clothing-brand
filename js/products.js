@@ -15,7 +15,15 @@ export const products = [
 {id:13,name:"Relaxed Linen Shirt",category:"Men",type:"Tops",kind:"Breathable linen blend",price:3490,badge:"SUMMER EDIT",image:photo("photo-1603252110481-7ba873bf42ab"),description:"An airy shirt for warm days and layered looks."},
 {id:14,name:"Pleated Wide-Leg Trouser",category:"Women",type:"Bottoms",kind:"Tailored woven fabric",price:3590,badge:"AURÉ EDIT",image:photo("photo-1594633312681-425c7b97ccd1"),description:"A flattering wide-leg shape with considered pleat details."},
 {id:15,name:"Cotton Day Dress",category:"Women",type:"Dresses",kind:"Cotton daywear",price:3290,badge:"EVERYDAY",image:photo("photo-1496747611176-843222e1e57c"),description:"A comfortable day dress with a relaxed feminine shape."},
-{id:16,name:"Essential Polo",category:"Men",type:"Tops",kind:"Cotton pique",price:1990,badge:"ESSENTIAL",image:photo("photo-1625910513413-5fc4b6c3b7b5"),description:"A timeless polo in a versatile everyday fit."}
+{id:16,name:"Essential Polo",category:"Men",type:"Tops",kind:"Cotton pique",price:1990,badge:"ESSENTIAL",image:photo("photo-1625910513413-5fc4b6c3b7b5"),description:"A timeless polo in a versatile everyday fit."},
+{id:17,name:"Rosewood Anarkali",category:"Women",type:"Dresses",kind:"Flowing occasion silhouette",price:6290,badge:"OCCASION EDIT",image:photo("photo-1583391733958-d5f7f4c8a7b1"),description:"A graceful occasion silhouette with room for movement."},
+{id:18,name:"Indigo Shirt Dress",category:"Women",type:"Dresses",kind:"Cotton shirt dress",price:3890,badge:"NEW ARRIVAL",image:photo("photo-1591369822096-ffd140ec948f"),description:"A relaxed shirt dress for everyday wear."},
+{id:19,name:"Printed Summer Dress",category:"Women",type:"Dresses",kind:"Lightweight printed weave",price:3590,badge:"SUMMER EDIT",image:photo("photo-1496747611176-843222e1e57c"),description:"A light, easy dress for warm-weather days."},
+{id:20,name:"Evening Drape Gown",category:"Women",type:"Dresses",kind:"Fluid occasion fabric",price:7990,badge:"OCCASION",image:photo("photo-1566174053879-31528523f8ae"),description:"A refined evening silhouette with a fluid drape."},
+{id:21,name:"Textured Nehru Jacket",category:"Men",type:"Tops",kind:"Textured cotton blend",price:4290,badge:"INDIAN EDIT",image:photo("photo-1617137968427-85924c800a22"),description:"A contemporary layer inspired by classic Indian tailoring."},
+{id:22,name:"Everyday Chino",category:"Men",type:"Bottoms",kind:"Cotton stretch twill",price:2790,badge:"CORE",image:photo("photo-1473966968600-fa801b869a1a"),description:"A clean everyday trouser with a comfortable straight fit."},
+{id:23,name:"Women's Linen Shirt",category:"Women",type:"Tops",kind:"Breathable linen blend",price:3190,badge:"SUMMER EDIT",image:photo("photo-1603252110481-7ba873bf42ab"),description:"A relaxed linen layer for warm days."},
+{id:24,name:"Women's Tailored Trouser",category:"Women",type:"Bottoms",kind:"Tailored woven fabric",price:3790,badge:"AURÉ EDIT",image:photo("photo-1594633312681-425c7b97ccd1"),description:"A versatile tailored trouser with a wide-leg shape."}
 ];
 
 /*
