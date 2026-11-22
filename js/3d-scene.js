@@ -62,7 +62,7 @@ export function createShowroom(canvas) {
     const ctx = c.getContext("2d");
     ctx.fillStyle = "#382b21"; ctx.fillRect(0,0,1024,256);
     ctx.strokeStyle = "#bd9867"; ctx.lineWidth = 5; ctx.strokeRect(16,16,992,224);
-    ctx.fillStyle = "#f1e4d1"; ctx.font = "500 82px Georgia"; ctx.textAlign = "center"; ctx.textBaseline = "middle";
+    ctx.fillStyle = "#f1e4d1"; ctx.font = label === "AURÉ" ? "600 150px Georgia" : "500 82px Georgia"; ctx.textAlign = "center"; ctx.textBaseline = "middle";
     ctx.fillText(label.toUpperCase(),512,128);
     const tex = new THREE.CanvasTexture(c); tex.colorSpace = THREE.SRGBColorSpace;
     const panel = new THREE.Mesh(new THREE.PlaneGeometry(width, .95), new THREE.MeshStandardMaterial({ map:tex, roughness:.65, emissive:0x1b1008, emissiveIntensity:.12 }));
