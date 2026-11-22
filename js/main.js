@@ -14,7 +14,7 @@ let scrollProgress = 0;
 let touchY = null;
 let toastTimer;
 
-const showroom = createShowroom($("#showroom-canvas"), openProduct);
+const showroom = createShowroom($("#showroom-canvas"), openProduct, showFloorDirectory);
 
 function toast(message) {
   $("#toast").textContent = message;
@@ -23,7 +23,7 @@ function toast(message) {
   toastTimer = setTimeout(() => $("#toast").classList.remove("show"), 2200);
 }
 
-function showDirectory() {
+function showFloorDirectory(visible) { const panel=$("#floor-directory"); panel.classList.toggle("visible",visible); panel.setAttribute("aria-hidden",visible?"false":"true"); }\n\nfunction showDirectory() {
   entered = true;
   department = "All";
   document.querySelectorAll("[data-department]").forEach(button => {
@@ -60,7 +60,7 @@ function choose(name) {
     button.setAttribute("aria-pressed", button.dataset.department === name ? "true" : "false");
   });
   showroom.setProgress(1);
-  showroom.setDepartment(name);
+  showFloorDirectory(false);\n  showroom.setDepartment(name);
 }
 
 function openProduct(id) {
@@ -147,7 +147,7 @@ $("#brand-home").addEventListener("click", (event) => {
   entered = false;
   department = "All";
   scrollProgress = 0;
-  try { showroom.clearDepartment(); showroom.setProgress(0); } catch (error) { console.error(error); }
+  try { showroom.clearDepartment(); showroom.setProgress(0); showFloorDirectory(false); } catch (error) { console.error(error); }
   $("#welcome-panel").classList.remove("hidden");
   
   
