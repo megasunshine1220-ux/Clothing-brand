@@ -86,7 +86,25 @@ function showProduct(id) {
   $("#modal-image").src = activeProduct.image; $("#modal-image").alt = activeProduct.name;
   $("#modal-category").textContent = activeProduct.category + " / AURÉ EDIT";
   $("#modal-name").textContent = activeProduct.name; $("#modal-price").textContent = money(activeProduct.price);
-  $("#modal-description").textContent = activeProduct.description; $("#modal-size").value = "";
+  $("#modal-description").textContent = activeProduct.description;
+  let qualityPanel = $("#modal-quality");
+  if (!qualityPanel) {
+    qualityPanel = document.createElement("section");
+    qualityPanel.id = "modal-quality";
+    qualityPanel.className = "quality-panel";
+    $("#modal-description").after(qualityPanel);
+  }
+  const quality = activeProduct.quality || {};
+  const detailRows = [
+    ["Fabric", quality.fabric], ["Yarn / thread", quality.yarn],
+    ["Weave / construction", quality.weave], ["Feel", quality.feel],
+    ["Fabric weight", quality.weight], ["Finish", quality.finish],
+    ["Fit", quality.fit], ["Care", quality.care]
+  ];
+  qualityPanel.innerHTML = '<div class="quality-heading"><span>FABRIC & CONSTRUCTION</span><small>DEMO SPECIFICATION</small></div>' +
+    detailRows.map(([label,value]) => '<div class="quality-row"><span>' + label + '</span><strong>' + (value || "To be confirmed") + '</strong></div>').join("") +
+    '<p class="quality-note">These are illustrative prototype details, not verified lab or supplier claims. Final fabric composition and thread specifications must be confirmed for the actual garment.</p>';
+  $("#modal-size").value = "";
   $("#product-modal").classList.add("open"); $("#product-modal").setAttribute("aria-hidden","false"); document.body.classList.add("lock");
 }
 function closeProduct() { $("#product-modal").classList.remove("open"); $("#product-modal").setAttribute("aria-hidden","true"); document.body.classList.remove("lock"); }
