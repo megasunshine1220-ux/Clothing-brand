@@ -12,13 +12,14 @@ export function createShowroom(canvas, onProductSelect = () => {}, onDirectoryTo
   renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 1.75));
   renderer.outputColorSpace = THREE.SRGBColorSpace;
   renderer.toneMapping = THREE.ACESFilmicToneMapping;
-  renderer.toneMappingExposure = 1.18;
+  renderer.toneMappingExposure = 1.28;
+  renderer.physicallyCorrectLights = true;
   renderer.shadowMap.enabled = true;
   renderer.shadowMap.type = THREE.PCFSoftShadowMap;
 
-  const hemi = new THREE.HemisphereLight(0xfff7ec, 0x817365, 2.1);
+  const hemi = new THREE.HemisphereLight(0xfff8ef, 0x8a8176, 2.6);
   scene.add(hemi);
-  const sun = new THREE.DirectionalLight(0xffead0, 3.0);
+  const sun = new THREE.DirectionalLight(0xffead0, 3.6);
   sun.position.set(-10, 17, 13);
   sun.castShadow = true;
   sun.shadow.mapSize.set(2048, 2048);
@@ -139,87 +140,58 @@ export function createShowroom(canvas, onProductSelect = () => {}, onDirectoryTo
   }
 
   // A department room has a distinct entrance, floor, display walls, rails and mannequins.
-  function mannequin(x,z,color,style) {
-    const group = new THREE.Group(); group.position.set(x,0,z);
-    const skin = new THREE.MeshStandardMaterial({color:0x9b705a,roughness:.72});
-    const fabric = new THREE.MeshStandardMaterial({color,roughness:.82});
-    const hair = new THREE.MeshStandardMaterial({color:0x211b18,roughness:.95});
-    const torso = new THREE.Mesh(new THREE.CapsuleGeometry(.27,.66,8,20),fabric); torso.position.y=1.95; group.add(torso);
-    const neck = new THREE.Mesh(new THREE.CylinderGeometry(.085,.1,.2,16),skin); neck.position.y=2.48; group.add(neck);
-    const head = new THREE.Mesh(new THREE.SphereGeometry(.2,24,20),skin); head.scale.set(.9,1.12,.92); head.position.y=2.73; group.add(head);
-    const cap = new THREE.Mesh(new THREE.SphereGeometry(.207,24,16,0,Math.PI*2,0,Math.PI*.58),hair); cap.position.set(0,2.79,-.015); group.add(cap);
-    for (const s of [-1,1]) {
-      const arm = new THREE.Mesh(new THREE.CapsuleGeometry(.09,.52,6,12),fabric);
-      arm.position.set(s*.37,1.95,0); arm.rotation.z=s*.16; group.add(arm);
-      const hand = new THREE.Mesh(new THREE.SphereGeometry(.075,12,10),skin); hand.position.set(s*.43,1.57,.02); group.add(hand);
-    }
-    if (style==="dress" || style==="kurta") {
-      const skirt = new THREE.Mesh(new THREE.CylinderGeometry(.25,style==="kurta"?.42:.68,style==="kurta"?1.2:1.42,32,2),fabric);
-      skirt.position.y=style==="kurta"?.75:.88; group.add(skirt);
-    } else {
-      for (const s of [-1,1]) {
-        const leg = new THREE.Mesh(new THREE.CylinderGeometry(.14,.12,1.05,20),fabric);
-        leg.position.set(s*.16,.62,0); group.add(leg);
-      }
-    }
-    const base = new THREE.Mesh(new THREE.CylinderGeometry(.4,.46,.08,28),brass); base.position.y=.04; group.add(base);
-    group.traverse(o=>{if(o.isMesh){o.castShadow=true;o.receiveShadow=true;}});
-    scene.add(group);
-    return group;
+  // Display garments as draped textile surfaces. These are static cloth meshes,
+  // not rigid extruded silhouettes; the shoulder line is supported by a real hanger.
+  function mannequin() {
+    // Deliberately no mannequin meshes: the showroom uses hanging garments only.
+    return null;
   }
 
-  // Real, volumetric garment meshes: shaped panels with thickness and soft pleat ribs.
-  function garmentShape(kind) {
-    const shape = new THREE.Shape();
-    if (kind === "trouser") {
-      shape.moveTo(-.31,1.22); shape.lineTo(-.30,.78); shape.lineTo(-.13,.08);
-      shape.lineTo(-.02,.08); shape.lineTo(.02,.72); shape.lineTo(.13,.08);
-      shape.lineTo(.31,.08); shape.lineTo(.30,.78); shape.lineTo(.31,1.22);
-      shape.lineTo(-.31,1.22);
-    } else if (kind === "dress" || kind === "kurta") {
-      shape.moveTo(-.24,1.25); shape.lineTo(-.42,.72); shape.lineTo(-.58,.05);
-      shape.lineTo(.58,.05); shape.lineTo(.42,.72); shape.lineTo(.24,1.25);
-      shape.lineTo(.14,1.34); shape.lineTo(-.14,1.34); shape.closePath();
-    } else {
-      shape.moveTo(-.20,1.30); shape.lineTo(-.48,1.18); shape.lineTo(-.62,.72);
-      shape.lineTo(-.48,.66); shape.lineTo(-.32,1.00); shape.lineTo(-.30,.08);
-      shape.lineTo(.30,.08); shape.lineTo(.32,1.00); shape.lineTo(.48,.66);
-      shape.lineTo(.62,.72); shape.lineTo(.48,1.18); shape.lineTo(.20,1.30);
-      shape.lineTo(.12,1.37); shape.lineTo(-.12,1.37); shape.closePath();
-    }
-    return shape;
-  }
   function makeGarment(kind, color, product) {
-    const material = new THREE.MeshPhysicalMaterial({
-      color, roughness:.88, metalness:0, side:THREE.DoubleSide,
-      sheen:0.55, sheenRoughness:.9, clearcoat:.04
+    const cols = 28, rows = 38;
+    const positions = [], uvs = [], indices = [];
+    const dress = kind === "dress" || kind === "kurta";
+    const trouser = kind === "trouser";
+    const height = trouser ? 1.42 : (kind === "kurta" ? 1.68 : dress ? 1.72 : 1.12);
+    const widthAt = v => {
+      if (trouser) return v < .18 ? .30 : v < .55 ? .38 : .54;
+      if (dress) return v < .16 ? .42 : v < .46 ? .34 : .42 + (v-.46)*.43;
+      return v < .2 ? .46 : v < .52 ? .34 : .39;
+    };
+    for (let j=0;j<=rows;j++) {
+      const v=j/rows;
+      const y=height*(1-v);
+      const half=widthAt(v);
+      for(let i=0;i<=cols;i++){
+        const u=i/cols, x=(u*2-1)*half;
+        const sideFall=Math.pow(Math.abs(u-.5)*2,2);
+        const verticalWave=Math.sin(v*Math.PI*1.7 + u*2.1)*.018;
+        const pleat=Math.sin(u*Math.PI*10 + (trouser?0.4:0))*0.012;
+        const drape=sideFall*.055 + pleat*(.25+v*.9) + verticalWave;
+        const z=drape + Math.sin(u*Math.PI*2)*.012*(.2+v);
+        positions.push(x,y,z);
+        uvs.push(u,1-v);
+      }
+    }
+    for(let j=0;j<rows;j++) for(let i=0;i<cols;i++){
+      const a=j*(cols+1)+i,b=a+1,c=a+cols+1,d=c+1;
+      indices.push(a,c,b,b,c,d);
+    }
+    const geometry=new THREE.BufferGeometry();
+    geometry.setAttribute("position",new THREE.Float32BufferAttribute(positions,3));
+    geometry.setAttribute("uv",new THREE.Float32BufferAttribute(uvs,2));
+    geometry.setIndex(indices);
+    geometry.computeVertexNormals();
+    const material=new THREE.MeshPhysicalMaterial({
+      color, roughness:.96, metalness:0, side:THREE.DoubleSide,
+      sheen:1, sheenColor:new THREE.Color(0xffffff), sheenRoughness:.92,
+      clearcoat:0, specularIntensity:.12
     });
-    const geometry = new THREE.ExtrudeGeometry(garmentShape(kind), {
-      depth:.075, bevelEnabled:true, bevelSegments:2, steps:1,
-      bevelSize:.025, bevelThickness:.025, curveSegments:10
-    });
-    geometry.translate(0,0,-.0375);
-    const cloth = new THREE.Mesh(geometry,material);
-    cloth.position.y=.73;
+    const cloth=new THREE.Mesh(geometry,material);
+    cloth.position.y=.58;
     cloth.userData.productId=product?.id;
     cloth.castShadow=true; cloth.receiveShadow=true;
-    const details = new THREE.Group();
-    // Raised seam lines and natural-looking folds make the cloth read as a 3D object.
-    const seamMat = new THREE.MeshStandardMaterial({color:new THREE.Color(color).multiplyScalar(.72),roughness:.95});
-    const foldCount = kind==="trouser" ? 3 : 4;
-    for(let n=0;n<foldCount;n++){
-      const x=-.19+n*(.38/Math.max(1,foldCount-1));
-      const points=[new THREE.Vector3(x,1.17,.045),new THREE.Vector3(x*.82,.78,.065),new THREE.Vector3(x*.72,.18,.045)];
-      const curve=new THREE.CatmullRomCurve3(points);
-      const rib=new THREE.Mesh(new THREE.TubeGeometry(curve,12,.009,5,false),seamMat);
-      details.add(rib);
-    }
-    if(kind!=="trouser"){
-      const collar=new THREE.Mesh(new THREE.TorusGeometry(.105,.018,6,18,Math.PI),seamMat);
-      collar.position.set(0,2.03,.045); collar.rotation.z=Math.PI; details.add(collar);
-    }
-    details.position.y=0;
-    cloth.add(details);
+    // A subtle second surface gives the hem and shoulders a textile edge.
     return cloth;
   }
   function rack(x,z,colors,items=[]) {
@@ -236,16 +208,22 @@ export function createShowroom(canvas, onProductSelect = () => {}, onDirectoryTo
     for(let i=0;i<count;i++){
       const xPos=-1.25+i*.41;
       const hangerGroup=new THREE.Group();
-      const hook=new THREE.Mesh(new THREE.TorusGeometry(.075,.012,6,16,Math.PI),brass);
-      hook.rotation.z=Math.PI; hook.position.y=.16; hangerGroup.add(hook);
-      const hangerShape=new THREE.Shape();
-      hangerShape.moveTo(-.19,.04); hangerShape.lineTo(0,-.12); hangerShape.lineTo(.19,.04);
-      const hangerWire=new THREE.Mesh(new THREE.TubeGeometry(new THREE.LineCurve3(new THREE.Vector3(-.19,.04,0),new THREE.Vector3(.19,.04,0)),1,.014,6),oak);
-      hangerGroup.add(hangerWire);
-      const left=new THREE.Mesh(new THREE.CylinderGeometry(.012,.012,.24,6),oak);
-      left.position.set(-.095,-.02,0);left.rotation.z=-.9;hangerGroup.add(left);
-      const right=left.clone();right.position.x=.095;right.rotation.z=.9;hangerGroup.add(right);
-      hangerGroup.position.set(xPos,2.18,.02);g.add(hangerGroup);
+      const hangerWood=new THREE.MeshStandardMaterial({color:0x76583d,roughness:.52});
+      const hangerPoints=[
+        new THREE.Vector3(-.22,.02,0),new THREE.Vector3(0,-.16,0),
+        new THREE.Vector3(.22,.02,0),new THREE.Vector3(-.22,.02,0)
+      ];
+      const hangerCurve=new THREE.CatmullRomCurve3(hangerPoints);
+      const hangerFrame=new THREE.Mesh(new THREE.TubeGeometry(hangerCurve,32,.018,8,false),hangerWood);
+      hangerGroup.add(hangerFrame);
+      const hookCurve=new THREE.CatmullRomCurve3([
+        new THREE.Vector3(0,.02,0),new THREE.Vector3(0,.13,0),
+        new THREE.Vector3(.045,.20,0),new THREE.Vector3(.10,.17,0),
+        new THREE.Vector3(.10,.10,0)
+      ]);
+      const metalHook=new THREE.Mesh(new THREE.TubeGeometry(hookCurve,20,.012,8,false),brass);
+      hangerGroup.add(metalHook);
+      hangerGroup.position.set(xPos,2.30,.02);g.add(hangerGroup);
       const product=items.length?items[i%items.length]:null;
       const kind=product?.type==="Bottoms"?"trouser":
         product?.name?.toLowerCase().includes("kurta")?"kurta":
@@ -371,8 +349,6 @@ export function createShowroom(canvas, onProductSelect = () => {}, onDirectoryTo
     );
     rack(cx-2.6,cz-1.25,d.colors,roomProducts);
     rack(cx+2.6,cz+1.65,d.colors.slice().reverse(),roomProducts);
-    mannequin(cx-1.6,cz+3.15,d.colors[0],d.styles[0]);
-    mannequin(cx+1.7,cz-3.3,d.colors[2],d.styles[1]);
     const spot=new THREE.SpotLight(0xffe2c0,65,17,Math.PI/4,.5,1);
     spot.position.set(cx,6.8,cz); spot.target.position.set(cx,1,cz); scene.add(spot,spot.target);
   }
@@ -381,12 +357,7 @@ export function createShowroom(canvas, onProductSelect = () => {}, onDirectoryTo
   addSign("THE AURÉ FAMILY EDIT  ·  MEN  ·  WOMEN  ·  KIDS",0,5.55,-46.12,9.2);
   addBox(8.4,.22,2.1,oak,0,.14,-43.35);
   addBox(8.15,.08,1.9,brass,0,.29,-43.35);
-  const father=mannequin(-2.15,-43.35,0x344653,"trouser");
-  father.scale.set(1.08,1.08,1.08);
-  const mother=mannequin(0,-43.35,0x925b58,"dress");
-  mother.scale.set(1.04,1.04,1.04);
-  const child=mannequin(2.05,-43.35,0xb59a70,"dress");
-  child.scale.set(.68,.68,.68);
+  // No toy-like mannequin figures in the campaign gallery.
 
   const arrowMat = new THREE.MeshStandardMaterial({color:0xc49a69,metalness:.72,roughness:.22,emissive:0x68421c,emissiveIntensity:.45});
   const floorArrow = new THREE.Group();
