@@ -95,7 +95,9 @@ export function createShowroom(canvas) {
     handle.position.set(-side*2.12,2.85,.18); pivot.add(handle);
     scene.add(pivot); doors.push({pivot,side});
   }
-  addSign("AURÉ  ·  ATELIER OF EVERYDAY", 0, 7.05, -.72, 5.8);
+  // Clear, front-facing brand fascia above the entrance.
+  addSign("AURÉ", 0, 7.05, -.42, 6.8);
+  addSign("ATELIER OF EVERYDAY", 0, 6.48, -.42, 4.8);
 
   // Gallery side walls are broken into real openings for six department rooms.
   const rows = [-8, -23, -38];
@@ -148,6 +150,7 @@ export function createShowroom(canvas) {
     const base = new THREE.Mesh(new THREE.CylinderGeometry(.4,.46,.08,28),brass); base.position.y=.04; group.add(base);
     group.traverse(o=>{if(o.isMesh){o.castShadow=true;o.receiveShadow=true;}});
     scene.add(group);
+    return group;
   }
 
   function rack(x,z,colors) {
@@ -225,6 +228,17 @@ export function createShowroom(canvas) {
     spot.position.set(cx,6.8,cz); spot.target.position.set(cx,1,cz); scene.add(spot,spot.target);
   }
 
+  // Family campaign display on the gallery's far feature wall.
+  addSign("THE AURÉ FAMILY EDIT  ·  MEN  ·  WOMEN  ·  KIDS",0,5.55,-46.12,9.2);
+  addBox(8.4,.22,2.1,oak,0,.14,-43.35);
+  addBox(8.15,.08,1.9,brass,0,.29,-43.35);
+  const father=mannequin(-2.15,-43.35,0x344653,"trouser");
+  father.scale.set(1.08,1.08,1.08);
+  const mother=mannequin(0,-43.35,0x925b58,"dress");
+  mother.scale.set(1.04,1.04,1.04);
+  const child=mannequin(2.05,-43.35,0xb59a70,"dress");
+  child.scale.set(.68,.68,.68);
+
   const resize=()=>{
     const w=canvas.clientWidth||window.innerWidth, h=canvas.clientHeight||window.innerHeight;
     renderer.setSize(w,h,false); camera.aspect=w/h; camera.updateProjectionMatrix();
@@ -237,8 +251,9 @@ export function createShowroom(canvas) {
   const setDepartment=name=>{
     const d=departments[name]; if(!d)return;
     activeDepartment=name;
-    roomTargetX=d.side*11.2;
-    roomTargetZ=d.z+3.5;
+    // Move through the corresponding side opening and settle inside the room.
+    roomTargetX=d.side*12.0;
+    roomTargetZ=d.z+1.7;
   };
   const clearDepartment=()=>{activeDepartment=null;roomTargetX=0;roomTargetZ=-5;};
   const animate=()=>{
