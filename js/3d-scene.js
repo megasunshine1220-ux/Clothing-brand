@@ -154,30 +154,43 @@ export function createShowroom(canvas, onProductSelect = () => {}, onDirectoryTo
     return group;
   }
 
+  const photoLoader = new THREE.TextureLoader();
+  photoLoader.setCrossOrigin("anonymous");
   function rack(x,z,colors,items=[]) {
     const g = new THREE.Group();
-    const postMat = blackMetal;
     for (const xx of [-1.5,1.5]) {
-      const leg = new THREE.Mesh(new THREE.CylinderGeometry(.035,.045,2.45,10),postMat);
+      const leg = new THREE.Mesh(new THREE.CylinderGeometry(.035,.045,2.45,10),blackMetal);
       leg.position.set(xx,1.22,0); g.add(leg);
       const foot = new THREE.Mesh(new THREE.CylinderGeometry(.07,.07,.05,12),brass);
       foot.position.set(xx,.06,0); g.add(foot);
     }
     const bar = new THREE.Mesh(new THREE.CylinderGeometry(.045,.045,3.15,12),brass);
     bar.rotation.z=Math.PI/2; bar.position.y=2.45; g.add(bar);
-    const displayColors = Array.from({length:Math.max(colors.length,items.length)},(_,i)=>colors[i%colors.length]);
-    displayColors.forEach((color,i)=>{
-      const hanger = new THREE.Mesh(new THREE.TorusGeometry(.12,.014,6,18,Math.PI),brass);
-      hanger.position.set(-1.25+i*.41,2.23,.02); hanger.rotation.z=Math.PI; g.add(hanger);
-      const cloth = new THREE.MeshStandardMaterial({color,roughness:.94});
-      const body = new THREE.Mesh(new THREE.BoxGeometry(.34,.62,.12),cloth);
-      body.position.set(-1.25+i*.41,1.7,.02); g.add(body);
-      const hem = new THREE.Mesh(new THREE.CylinderGeometry(.13,.2,.38,16),cloth);
-      hem.position.set(-1.25+i*.41,1.2,.02); g.add(hem);
-      const product = items.length ? items[i % items.length] : null;
-      if (product) { body.userData.productId = product.id; hem.userData.productId = product.id; }
-    });
-    g.position.set(x,0,z); g.traverse(o=>{if(o.isMesh){o.castShadow=true;o.receiveShadow=true;}}); scene.add(g);
+    const count=Math.max(colors.length,items.length);
+    for(let i=0;i<count;i++){
+      const xPos=-1.25+i*.41;
+      const hanger=new THREE.Mesh(new THREE.TorusGeometry(.12,.014,6,18,Math.PI),brass);
+      hanger.position.set(xPos,2.23,.02); hanger.rotation.z=Math.PI; g.add(hanger);
+      const product=items.length?items[i%items.length]:null;
+      if(product){
+        const photoMaterial=new THREE.MeshStandardMaterial({color:0xffffff,roughness:.9});
+        const photoCard=new THREE.Mesh(new THREE.PlaneGeometry(.43,.92),photoMaterial);
+        photoCard.position.set(xPos,1.65,.055);
+        photoCard.userData.productId=product.id;
+        g.add(photoCard);
+        photoLoader.load(product.image,texture=>{
+          texture.colorSpace=THREE.SRGBColorSpace;
+          photoCard.material.map=texture;
+          photoCard.material.needsUpdate=true;
+        },undefined,()=>{});
+      } else {
+        const fallback=new THREE.Mesh(new THREE.PlaneGeometry(.43,.92),new THREE.MeshStandardMaterial({color:colors[i%colors.length]}));
+        fallback.position.set(xPos,1.65,.055);g.add(fallback);
+      }
+    }
+    g.position.set(x,0,z);
+    g.traverse(o=>{if(o.isMesh){o.castShadow=true;o.receiveShadow=true;}});
+    scene.add(g);
   }
 
   const departments = {
