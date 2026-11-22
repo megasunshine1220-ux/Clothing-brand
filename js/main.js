@@ -97,9 +97,7 @@ function renderProduct() {
   $("#modal-image").alt = activeProduct.name;
   $("#modal-name").textContent = activeProduct.name;
   $("#modal-price").innerHTML = '<span class="sale-price">' + money(activeProduct.price) + '</span>' +
-    '<del class="original-price">' + money(activeProduct.mrp) + '</del>' +
-    '<span class="discount-chip">' + activeProduct.discountPercent + '% OFF</span>' +
-    '<small class="pricing-note">Illustrative offer pricing for this prototype.</small>';
+    '<small class="pricing-note">Sample catalogue price — confirm before commercial launch.</small>';
   $("#modal-category").textContent = activeProduct.category + " / AURÉ EDIT";
   $("#modal-description").textContent = activeProduct.description;
   const quality = activeProduct.quality || {};
@@ -129,6 +127,7 @@ function openProduct(id) {
   productIndex = found;
   renderProduct();
   $("#product-modal").classList.add("open");
+  $("#product-modal").setAttribute("aria-hidden", "false");
   document.body.classList.add("lock");
 }
 
@@ -140,6 +139,7 @@ function stepProduct(direction) {
 
 function closeProduct() {
   $("#product-modal").classList.remove("open");
+  $("#product-modal").setAttribute("aria-hidden", "true");
   document.body.classList.remove("lock");
 }
 
@@ -253,12 +253,14 @@ window.addEventListener("keydown", (event) => {
 
 $("#bag-open").addEventListener("click", () => {
   $("#bag-drawer").classList.add("open");
+  $("#bag-drawer").setAttribute("aria-hidden", "false");
   $("#drawer-backdrop").classList.add("open");
   document.body.classList.add("lock");
 });
 
 function closeBag() {
   $("#bag-drawer").classList.remove("open");
+  $("#bag-drawer").setAttribute("aria-hidden", "true");
   $("#drawer-backdrop").classList.remove("open");
   document.body.classList.remove("lock");
 }
