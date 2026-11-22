@@ -1,6 +1,7 @@
 import * as THREE from "three";
+import { products } from "./products.js";
 
-export function createShowroom(canvas) {
+export function createShowroom(canvas, onProductSelect = () => {}) {
   const scene = new THREE.Scene();
   scene.background = new THREE.Color("#e9e3d9");
   scene.fog = new THREE.Fog("#e9e3d9", 38, 105);
@@ -153,7 +154,7 @@ export function createShowroom(canvas) {
     return group;
   }
 
-  function rack(x,z,colors) {
+  function rack(x,z,colors,items=[]) {
     const g = new THREE.Group();
     const postMat = blackMetal;
     for (const xx of [-1.5,1.5]) {
@@ -172,6 +173,8 @@ export function createShowroom(canvas) {
       body.position.set(-1.25+i*.41,1.7,.02); g.add(body);
       const hem = new THREE.Mesh(new THREE.CylinderGeometry(.13,.2,.38,16),cloth);
       hem.position.set(-1.25+i*.41,1.2,.02); g.add(hem);
+      const product = items.length ? items[i % items.length] : null;
+      if (product) { body.userData.productId = product.id; hem.userData.productId = product.id; }
     });
     g.position.set(x,0,z); g.traverse(o=>{if(o.isMesh){o.castShadow=true;o.receiveShadow=true;}}); scene.add(g);
   }
@@ -220,8 +223,12 @@ export function createShowroom(canvas) {
       addBox(1.9,.08,.28,oak,cx+xx,3.8,cz+4.65);
       const lamp=new THREE.PointLight(0xffd7a4,8,5); lamp.position.set(cx+xx,3.7,cz+3.8); scene.add(lamp);
     }
-    rack(cx-2.6,cz-1.25,d.colors);
-    rack(cx+2.6,cz+1.65,d.colors.slice().reverse());
+    const roomProducts = products.filter(item =>
+      name === "Men" || name === "Women" ? item.category === name :
+      name === "Essentials" ? item.category === "Essentials" : item.type === name
+    );
+    rack(cx-2.6,cz-1.25,d.colors,roomProducts);
+    rack(cx+2.6,cz+1.65,d.colors.slice().reverse(),roomProducts);
     mannequin(cx-1.6,cz+3.15,d.colors[0],d.styles[0]);
     mannequin(cx+1.7,cz-3.3,d.colors[2],d.styles[1]);
     const spot=new THREE.SpotLight(0xffe2c0,65,17,Math.PI/4,.5,1);
@@ -238,6 +245,21 @@ export function createShowroom(canvas) {
   mother.scale.set(1.04,1.04,1.04);
   const child=mannequin(2.05,-43.35,0xb59a70,"dress");
   child.scale.set(.68,.68,.68);
+
+  const raycaster = new THREE.Raycaster();
+  const pointer = new THREE.Vector2();
+  const clickable = [];
+  scene.traverse(object => { if (object.isMesh && object.userData.productId) clickable.push(object); });
+  canvas.style.pointerEvents = "auto";
+  const onCanvasClick = event => {
+    const rect = canvas.getBoundingClientRect();
+    pointer.x = ((event.clientX - rect.left) / rect.width) * 2 - 1;
+    pointer.y = -((event.clientY - rect.top) / rect.height) * 2 + 1;
+    raycaster.setFromCamera(pointer, camera);
+    const hit = raycaster.intersectObjects(clickable, false)[0];
+    if (hit && hit.object.userData.productId) onProductSelect(hit.object.userData.productId);
+  };
+  canvas.addEventListener("click", onCanvasClick);
 
   const resize=()=>{
     const w=canvas.clientWidth||window.innerWidth, h=canvas.clientHeight||window.innerHeight;
@@ -277,6 +299,6 @@ export function createShowroom(canvas) {
     setProgress,
     setDepartment,
     clearDepartment,
-    destroy(){cancelAnimationFrame(raf);window.removeEventListener("resize",resize);renderer.dispose();}
+    destroy(){cancelAnimationFrame(raf);window.removeEventListener("resize",resize);canvas.removeEventListener("click",onCanvasClick);renderer.dispose();}
   };
 }
