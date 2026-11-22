@@ -14,7 +14,7 @@ let scrollProgress = 0;
 let touchY = null;
 let toastTimer;
 
-const showroom = createShowroom($("#showroom-canvas"));
+const showroom = createShowroom($("#showroom-canvas"), openProduct);
 
 function toast(message) {
   $("#toast").textContent = message;
@@ -26,17 +26,14 @@ function toast(message) {
 function showDirectory() {
   entered = true;
   department = "All";
-  try { showroom.clearDepartment(); } catch (error) { console.error("3D reset failed:", error); }
-  document.querySelectorAll("[data-department]").forEach((button) => {
+  document.querySelectorAll("[data-department]").forEach(button => {
     button.classList.remove("active");
     button.setAttribute("aria-pressed", "false");
   });
   scrollProgress = 1;
-  try { showroom.setProgress(1); } catch (error) { console.error(error); }
+  showroom.setProgress(1);
+  showroom.clearDepartment();
   $("#welcome-panel").classList.add("hidden");
-  $("#entrance-directory").classList.add("visible");
-  $("#product-stage").classList.remove("visible");
-  $("#inside-title").classList.add("visible");
   $("#world-status").textContent = "02 — INSIDE THE AURÉ BOUTIQUE";
 }
 
@@ -47,58 +44,23 @@ function enter() {
 window.navigateToDepartment = choose;
 window.navigateToMain = () => {
   showDirectory();
-  $("#department-title").textContent = "THE AURÉ BOUTIQUE";
+  
 };
-
-function renderProducts() {
-  const list = products.filter((item) => {
-    if (department === "Men" || department === "Women") return item.category === department;
-    if (department === "Essentials") return item.category === "Essentials";
-    return item.type === department;
-  });
-
-  $("#product-grid").innerHTML = list.map((item) => `
-    <article class="stage-product">
-      <button class="stage-image" data-product="${item.id}" aria-label="View ${item.name}">
-        <img src="${item.image}" alt="${item.name}" loading="lazy">
-        <span>VIEW DETAILS ↗</span>
-      </button>
-      <div class="stage-product-meta">
-        <div><strong>${item.name}</strong><small>${item.kind}</small></div>
-        <b>${money(item.price)}</b>
-      </div>
-      <button class="stage-quick-add" data-add="${item.id}">QUICK ADD +</button>
-    </article>
-  `).join("") || '<p class="empty-collection">New pieces are being prepared for this collection.</p>';
-}
 
 function choose(name) {
   const valid = ["Men", "Women", "Dresses", "Tops", "Bottoms", "Essentials"];
   if (!valid.includes(name)) return;
-
   entered = true;
   scrollProgress = 1;
   department = name;
   $("#welcome-panel").classList.add("hidden");
-  $("#entrance-directory").classList.remove("visible");
-  $("#inside-title").classList.add("visible");
-  $("#department-title").textContent = name.toUpperCase() + " DEPARTMENT";
-  $("#stage-heading").textContent = name + " collection";
-  $("#product-stage").classList.add("visible");
-  $("#world-status").textContent = "03 — " + name.toUpperCase() + " COLLECTION";
-
-  document.querySelectorAll("[data-department]").forEach((button) => {
+  $("#world-status").textContent = "03 — " + name.toUpperCase() + " ROOM";
+  document.querySelectorAll("[data-department]").forEach(button => {
     button.classList.toggle("active", button.dataset.department === name);
     button.setAttribute("aria-pressed", button.dataset.department === name ? "true" : "false");
   });
-
-  renderProducts();
-  try {
-    showroom.setProgress(1);
-    showroom.setDepartment(name);
-  } catch (error) {
-    console.error("3D department transition failed:", error);
-  }
+  showroom.setProgress(1);
+  showroom.setDepartment(name);
 }
 
 function openProduct(id) {
@@ -181,9 +143,9 @@ $("#enter-shop").addEventListener("click", enter);
 $("#main-shop").addEventListener("click", window.navigateToMain);
 
 $("#back-departments").addEventListener("click", () => {
-  $("#product-stage").classList.remove("visible");
+  
   try { showroom.clearDepartment(); } catch (error) { console.error(error); }
-  $("#entrance-directory").classList.add("visible");
+  
   $("#world-status").textContent = "02 — INSIDE THE AURÉ BOUTIQUE";
   document.querySelectorAll("[data-department]").forEach((button) => {
     button.classList.remove("active");
@@ -198,9 +160,9 @@ $("#brand-home").addEventListener("click", (event) => {
   scrollProgress = 0;
   try { showroom.clearDepartment(); showroom.setProgress(0); } catch (error) { console.error(error); }
   $("#welcome-panel").classList.remove("hidden");
-  $("#entrance-directory").classList.remove("visible");
-  $("#product-stage").classList.remove("visible");
-  $("#inside-title").classList.remove("visible");
+  
+  
+  
   $("#world-status").textContent = "01 — OUTSIDE THE AURÉ BOUTIQUE";
   document.querySelectorAll("[data-department]").forEach((button) => {
     button.classList.remove("active");
@@ -218,8 +180,8 @@ function driveScroll(delta) {
   } else if (scrollProgress <= .08) {
     entered = false;
     $("#welcome-panel").classList.remove("hidden");
-    $("#entrance-directory").classList.remove("visible");
-    $("#inside-title").classList.remove("visible");
+    
+    
     $("#world-status").textContent = "01 — OUTSIDE THE AURÉ BOUTIQUE";
   }
 }
