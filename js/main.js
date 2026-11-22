@@ -97,7 +97,7 @@ function renderProduct() {
   $("#modal-image").alt = activeProduct.name;
   $("#modal-name").textContent = activeProduct.name;
   $("#modal-price").innerHTML = '<span class="sale-price">' + money(activeProduct.price) + '</span>' +
-    '<small class="pricing-note">Sample catalogue price — confirm before commercial launch.</small>';
+    '<small class="pricing-note">Sample catalogue price — confirm before commercial launch. Editorial reference image; replace with the exact garment photograph before sale.</small>';
   $("#modal-category").textContent = activeProduct.category + " / AURÉ EDIT";
   $("#modal-description").textContent = activeProduct.description;
   const quality = activeProduct.quality || {};
