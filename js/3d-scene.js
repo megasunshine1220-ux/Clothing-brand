@@ -277,6 +277,28 @@ export function createShowroom(canvas, onProductSelect = () => {}, onDirectoryTo
     addBox(.12,6.4,.12,brass,cx+4.9,3.2,cz-5.65);
     addBox(9.9,.12,.12,brass,cx,6.4,cz-5.65);
     addSign(name+"  COLLECTION",cx,5.55,cz-5.48,4.7);
+    // Refined boutique detailing: timber slat feature, floating shelves and warm integrated lighting.
+    const featureSide = -d.side;
+    for(let slat=0;slat<17;slat++){
+      const sx=cx-4.35+slat*.54;
+      addBox(.055,4.65,.10,oak,sx,3.05,cz-5.66,{castShadow:false});
+    }
+    addBox(9.65,.10,.14,brass,cx,5.48,cz-5.60,{castShadow:false});
+    // Three floating display shelves on the inner side wall, clear of the garment rails.
+    for(let level=0;level<3;level++){
+      const shelfY=1.45+level*1.18;
+      addBox(.72,.075,4.35,oak,cx+featureSide*5.18,shelfY,cz+.05,{castShadow:false});
+      addBox(.78,.035,4.42,brass,cx+featureSide*5.18,shelfY+.055,cz+.05,{castShadow:false});
+      const shelfGlow=new THREE.PointLight(0xffd7a4,3.5,4);
+      shelfGlow.position.set(cx+featureSide*4.75,shelfY+.28,cz+.05);scene.add(shelfGlow);
+    }
+    // A low central styling table gives the room a real retail floor-plan focal point.
+    addBox(1.65,.16,1.15,oak,cx,0.88,cz+.05);
+    addBox(1.52,.055,1.02,brass,cx,0.99,cz+.05,{castShadow:false});
+    for(const tx of [-.62,.62]){
+      addBox(.09,.78,.09,blackMetal,cx+tx,.43,cz+.05);
+    }
+
     // Large editorial campaign portrait panels use real Indian fashion photography.
     const campaignUrl = (name==="Women" || name==="Dresses")
       ? "https://images.unsplash.com/photo-1666160525588-95294b909229?auto=format&fit=crop&w=900&q=85"
