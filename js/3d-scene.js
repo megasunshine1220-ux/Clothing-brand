@@ -75,8 +75,9 @@ export function createShowroom(canvas) {
   addBox(14.2, 7.5, .45, warmWall, 0, 3.75, -46.4);
   addBox(14.2, .24, .55, brass, 0, 7.7, -1.4, {castShadow:false});
   // Entry portal, bronze framing and two glazed pivot doors.
-  addBox(14.2, 8, .5, warmWall, 0, 4, -1.5);
-  addBox(5.4, 6.4, .8, darkWood, 0, 3.2, -1.1);
+  addBox(4.35, 8, .5, warmWall, -4.93, 4, -1.5);
+  addBox(4.35, 8, .5, warmWall, 4.93, 4, -1.5);
+  addBox(5.55, 1.6, .5, warmWall, 0, 7.2, -1.5);
   for (const x of [-2.85, 2.85]) {
     addBox(.14, 6.8, .22, brass, x, 3.4, -.55);
     addBox(.12, 6.8, .22, brass, x*1.12, 3.4, -.55);
@@ -112,8 +113,6 @@ export function createShowroom(canvas) {
       glow.position.set(side*7.2,4.9,z); scene.add(glow);
     }
   }
-  addBox(.28,7.5,51,plaster,-6.9,3.75,-21);
-  addBox(.28,7.5,51,plaster,6.9,3.75,-21);
   // Soft architectural light strips.
   for (let z=-5; z>-45; z-=5) {
     const strip = new THREE.Mesh(new THREE.BoxGeometry(5.2,.055,.16),new THREE.MeshBasicMaterial({color:0xffe2b9}));
