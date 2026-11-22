@@ -298,6 +298,46 @@ export function createShowroom(canvas, onProductSelect = () => {}, onDirectoryTo
     for(const tx of [-.62,.62]){
       addBox(.09,.78,.09,blackMetal,cx+tx,.43,cz+.05);
     }
+    // Folded knitwear stacks make the shelves and styling table read as a stocked boutique.
+    const foldedPalette = [0xd8cbbb, 0x8c7460, 0x4a5350, 0xb18a72, 0x343b40];
+    for (let level=0; level<3; level++) {
+      for (let pile=0; pile<3; pile++) {
+        const stackX = cx + featureSide*5.18;
+        const stackZ = cz - 1.35 + pile*1.28;
+        for (let layer=0; layer<3; layer++) {
+          const textile = new THREE.Mesh(
+            new THREE.BoxGeometry(.48,.075,.62),
+            new THREE.MeshStandardMaterial({color:foldedPalette[(level+pile+layer)%foldedPalette.length],roughness:.96})
+          );
+          textile.position.set(stackX,1.56+level*1.18+layer*.078,stackZ);
+          textile.castShadow=true; textile.receiveShadow=true; scene.add(textile);
+        }
+      }
+    }
+    for (let layer=0; layer<3; layer++) {
+      const folded = new THREE.Mesh(
+        new THREE.BoxGeometry(.82,.085,.62),
+        new THREE.MeshStandardMaterial({color:foldedPalette[(layer+1)%foldedPalette.length],roughness:.98})
+      );
+      folded.position.set(cx-.48,1.11+layer*.087,cz+.05);
+      folded.castShadow=true; scene.add(folded);
+    }
+    // Recessed linear ceiling track and three focused retail spotlights.
+    addBox(7.6,.055,.12,blackMetal,cx,6.92,cz,{castShadow:false});
+    for (const offset of [-2.65,0,2.65]) {
+      const housing = new THREE.Mesh(new THREE.CylinderGeometry(.13,.17,.16,20),brass);
+      housing.position.set(cx+offset,6.82,cz-.15);
+      scene.add(housing);
+      const beam = new THREE.SpotLight(0xffe8cf,22,10,Math.PI/7,.58,1.4);
+      beam.position.set(cx+offset,6.72,cz-.15);
+      beam.target.position.set(cx+offset*.72,1.2,cz-.55);
+      scene.add(beam,beam.target);
+    }
+    // Fine wall skirting and vertical wall-panel reveals add architectural scale.
+    addBox(.10,.18,11.35,darkWood,cx+d.side*5.38,.12,cz,{castShadow:false});
+    for (const panelZ of [-4.2,-2.1,0,2.1,4.2]) {
+      addBox(.035,3.4,.035,brass,cx+d.side*5.36,3.0,cz+panelZ,{castShadow:false});
+    }
 
     // Large editorial campaign portrait panels use real Indian fashion photography.
     const campaignUrl = (name==="Women" || name==="Dresses")
