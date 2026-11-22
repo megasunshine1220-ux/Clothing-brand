@@ -50,7 +50,7 @@ export function createShowroom(canvas, onProductSelect = () => {}, onDirectoryTo
   const darkWood = new THREE.MeshStandardMaterial({ color: 0x49372b, roughness: .42 });
   const oak = new THREE.MeshStandardMaterial({ color: 0x9b7654, roughness: .55 });
   const brass = new THREE.MeshStandardMaterial({ color: 0xb18a58, metalness: .78, roughness: .24 });
-  const glass = new THREE.MeshPhysicalMaterial({ color: 0xdce8e5, metalness: .08, roughness: .08, transmission: .72, transparent: true, opacity: .34, thickness: .08 });
+  const glass = new THREE.MeshPhysicalMaterial({ color: 0x91aaa8, metalness: .12, roughness: .16, transmission: .28, transparent: true, opacity: .62, thickness: .12 });
   const blackMetal = new THREE.MeshStandardMaterial({ color: 0x292725, metalness: .72, roughness: .3 });
 
   const addBox = (w,h,d,material,x,y,z,opts={}) => {
@@ -86,17 +86,27 @@ export function createShowroom(canvas, onProductSelect = () => {}, onDirectoryTo
   const doors = [];
   for (const side of [-1, 1]) {
     const pivot = new THREE.Group(); pivot.position.set(side*2.62,0,-.55);
-    const leaf = new THREE.Mesh(new THREE.BoxGeometry(2.58,6.05,.12), brass);
-    leaf.position.x = -side*1.29; pivot.add(leaf);
-    const pane = new THREE.Mesh(new THREE.BoxGeometry(2.2,5.55,.055), glass);
-    pane.position.set(-side*1.29,3.03,.09); pivot.add(pane);
-    const rail = new THREE.Mesh(new THREE.BoxGeometry(2.28,.08,.08), blackMetal);
-    rail.position.set(-side*1.29,1.05,.15); pivot.add(rail);
-    const handle = new THREE.Mesh(new THREE.CylinderGeometry(.035,.035,.78,16),brass);
-    handle.position.set(-side*2.12,2.85,.18); pivot.add(handle);
+    const doorX=-side*1.29;
+    // Large clear glass leaf with a visible bronze perimeter instead of a solid slab.
+    const pane = new THREE.Mesh(new THREE.BoxGeometry(2.18,5.55,.07), glass);
+    pane.position.set(doorX,3.03,.015); pivot.add(pane);
+    const frameParts=[
+      [2.58,.16,.16,doorX,3.02,.08],
+      [2.58,.16,.16,doorX,6.00,.08],
+      [.16,5.9,.16,doorX-1.21,3.02,.08],
+      [.16,5.9,.16,doorX+1.21,3.02,.08]
+    ];
+    for(const [w,h,d,x,y,z] of frameParts){
+      const part=new THREE.Mesh(new THREE.BoxGeometry(w,h,d),brass);
+      part.position.set(x,y,z);pivot.add(part);
+    }
+    const rail = new THREE.Mesh(new THREE.BoxGeometry(2.25,.075,.08), blackMetal);
+    rail.position.set(doorX,1.08,.13); pivot.add(rail);
+    const handle = new THREE.Mesh(new THREE.CylinderGeometry(.035,.035,.9,16),brass);
+    handle.position.set(-side*2.12,2.95,.18); pivot.add(handle);
     scene.add(pivot); doors.push({pivot,side});
   }
-  // Clear, front-facing brand fascia above the entrance.
+  // Brass threshold makes the entrance visible from the exterior approach.\n  addBox(5.5,.12,.72,brass,0,.02,-1.05,{castShadow:false});\n  // Clear, front-facing brand fascia above the entrance.
   addSign("AURÉ", 0, 7.05, -.42, 6.8);
   addSign("ATELIER OF EVERYDAY", 0, 6.48, -.42, 4.8);
 
