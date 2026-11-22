@@ -17,3 +17,18 @@ export const products = [
 {id:15,name:"Cotton Day Dress",category:"Women",type:"Dresses",kind:"Cotton daywear",price:3290,badge:"EVERYDAY",image:photo("photo-1496747611176-843222e1e57c"),description:"A comfortable day dress with a relaxed feminine shape."},
 {id:16,name:"Essential Polo",category:"Men",type:"Tops",kind:"Cotton pique",price:1990,badge:"ESSENTIAL",image:photo("photo-1625910513413-5fc4b6c3b7b5"),description:"A timeless polo in a versatile everyday fit."}
 ];
+
+/*
+ * These are illustrative demo specifications for the prototype, not verified supplier
+ * test results or certified fibre-content claims. Replace them with manufacturer data
+ * before selling real garments.
+ */
+const fabricSpecs = {
+  Tops: {fabric:"Cotton poplin / cotton jersey (style dependent)", yarn:"Combed cotton yarn; compact-spun for a smoother surface", weave:"Plain weave for poplin; knitted single jersey for tees", feel:"Smooth, breathable and soft against the skin", weight:"Light to medium weight; varies by garment", finish:"Pre-washed demo finish; actual finish to be confirmed", care:"Wash inside out with similar colours; follow the final garment care label", fit:"Relaxed everyday fit; check the size guide"},
+  Dresses: {fabric:"Fluid woven viscose blend or cotton (style dependent)", yarn:"Fine ring-spun yarn for a soft hand feel", weave:"Plain weave / twill weave depending on the design", feel:"Soft drape with a lightweight, flowing feel", weight:"Lightweight to medium weight", finish:"Soft-touch finish; final finish depends on production", care:"Gentle wash; dry in shade; follow the final garment care label", fit:"Designed for movement; check the size guide"},
+  Bottoms: {fabric:"Cotton twill or structured denim (style dependent)", yarn:"Ring-spun cotton warp yarn; denim may use indigo-dyed warp yarn", weave:"Twill weave for diagonal texture and durability", feel:"Structured hand feel with comfortable movement", weight:"Medium weight; denim may be heavier", finish:"Garment wash / softener finish depending on style", care:"Wash inside out with similar colours; avoid harsh bleach", fit:"Regular or relaxed cut; check the size guide"}
+};
+products.forEach(product => {
+  const spec = fabricSpecs[product.type] || fabricSpecs.Tops;
+  product.quality = {...spec};
+});
