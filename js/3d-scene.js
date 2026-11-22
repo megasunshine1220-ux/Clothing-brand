@@ -117,8 +117,8 @@ export function createShowroom(canvas) {
   for (let z=-5; z>-45; z-=5) {
     const strip = new THREE.Mesh(new THREE.BoxGeometry(5.2,.055,.16),new THREE.MeshBasicMaterial({color:0xffe2b9}));
     strip.position.set(0,7.48,z); scene.add(strip);
-    const light = new THREE.RectAreaLight(0xffe3c4, 4.5, 5, 2.2);
-    light.position.set(0,7.25,z); light.rotation.x=-Math.PI/2; scene.add(light);
+    const light = new THREE.PointLight(0xffe3c4, 7, 12);
+    light.position.set(0,6.9,z); scene.add(light);
   }
 
   // A department room has a distinct entrance, floor, display walls, rails and mannequins.
