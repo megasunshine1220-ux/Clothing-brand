@@ -4,3 +4,13 @@
 
 /* Navigation controls must remain above the WebGL canvas and clickable. */
 #showroom-canvas{z-index:0;pointer-events:none}.immersive-header{z-index:50;pointer-events:auto}.immersive-header .main-nav,.immersive-header .main-nav button,.immersive-header #main-shop{pointer-events:auto;position:relative;z-index:51}.entrance-directory{z-index:40;pointer-events:none}.entrance-directory.visible{pointer-events:auto}.entrance-directory button{position:relative;z-index:41;pointer-events:auto}.product-stage{z-index:42;pointer-events:none}.product-stage.visible{pointer-events:auto}.product-stage button{pointer-events:auto}
+
+/* Keep the showroom unobstructed; product details open only after a garment is clicked. */
+.inside-title,.entrance-directory,.product-stage{display:none!important}
+#showroom-canvas{pointer-events:auto!important;z-index:0}
+.immersive-header{z-index:50}
+.product-modal{background:#fff}
+.product-modal .modal-backdrop{background:#fff!important}
+.modal-card{background:#fff!important;color:#211b15!important;box-shadow:0 24px 90px #0002}
+.modal-details{background:#fff}
+.modal-card>img{background:#fff}
