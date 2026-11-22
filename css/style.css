@@ -27,3 +27,15 @@
 .product-info{align-items:flex-start}
 .product-price{font-weight:600}
 @media(min-width:1000px){.product-photo{height:420px}}
+
+/* Product quality and textile construction detail panel */
+.quality-panel{margin:18px 0 8px;padding:15px;background:#e8e1d6;border:1px solid #d4cabc}
+.quality-heading{display:flex;justify-content:space-between;gap:10px;align-items:center;padding-bottom:10px;border-bottom:1px solid #cfc4b5}
+.quality-heading span{font-size:8px;letter-spacing:.15em;font-weight:700}
+.quality-heading small{font-size:7px;letter-spacing:.1em;color:#9a6d50}
+.quality-row{display:grid;grid-template-columns:105px 1fr;gap:12px;padding:9px 0;border-bottom:1px solid #d7cec2;align-items:start}
+.quality-row span{font-size:9px;color:#84796c}
+.quality-row strong{font-size:9px;line-height:1.5;font-weight:500;color:#302a24}
+.quality-note{font-size:8px!important;line-height:1.55!important;color:#887d70!important;margin:12px 0 0}
+.modal-details{max-height:86vh;overflow:auto}
+@media(max-width:600px){.quality-row{grid-template-columns:88px 1fr}.quality-panel{padding:12px}.modal-details{max-height:none}}
