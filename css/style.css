@@ -56,3 +56,30 @@
 .modal-details{min-width:0}
 .modal-card>img{object-fit:contain;background:#fff}
 @media(max-width:600px){.product-browse{margin-bottom:12px}.product-browse button{padding:8px;font-size:7px}}
+
+
+/* Full-screen garment viewer: large product image with a dedicated details panel. */
+.product-modal{padding:0!important;display:block!important;overflow:hidden;background:#fff}
+.product-modal .modal-backdrop{display:none!important}
+.modal-card{position:absolute!important;inset:0!important;width:100%!important;height:100dvh!important;max-height:none!important;max-width:none!important;overflow:hidden!important;grid-template-columns:minmax(0,1.12fr) minmax(390px,.88fr)!important;gap:0!important;border:0!important;box-shadow:none!important}
+.modal-card>img{width:100%!important;height:100%!important;min-height:0!important;max-height:100dvh!important;object-fit:contain!important;padding:clamp(18px,4vw,64px)!important;background:#fff!important}
+.modal-details{height:100%!important;max-height:100dvh!important;overflow-y:auto!important;align-self:stretch!important;padding:clamp(28px,5vw,76px)!important;padding-top:76px!important;border-left:1px solid #eee8df;display:flex;flex-direction:column;justify-content:center}
+.modal-details h2{font-size:clamp(30px,3vw,48px)!important;line-height:1.08}
+#modal-price{display:flex;align-items:center;flex-wrap:wrap;gap:12px;margin:14px 0 8px}
+.sale-price{font-size:22px;font-weight:700;color:#211b15}
+.original-price{font-size:14px;color:#93897d;font-weight:400}
+.discount-chip{display:inline-block;padding:7px 10px;background:#f4e5df;color:#9b382c;font-size:11px;font-weight:700;letter-spacing:.06em}
+.pricing-note{flex-basis:100%;font-size:9px;color:#9a8d7d;font-weight:400}
+.modal-close{position:fixed!important;z-index:5!important;right:22px!important;top:18px!important;width:44px!important;height:44px!important;background:#f4f0e9!important;border:1px solid #ddd3c7!important}
+.product-browse{position:sticky;top:-1px;background:#fff;padding:0 0 14px;z-index:2}
+#modal-description{font-size:13px!important;line-height:1.8!important}
+#modal-quality{margin:12px 0}
+@media(max-width:760px){
+ .modal-card{grid-template-columns:1fr!important;grid-template-rows:minmax(230px,43dvh) minmax(0,1fr)!important;overflow:hidden!important}
+ .modal-card>img{height:43dvh!important;min-height:0!important;padding:16px!important}
+ .modal-details{height:57dvh!important;max-height:57dvh!important;padding:18px 22px 28px!important;padding-top:18px!important;border-left:0!important;border-top:1px solid #eee8df!important;justify-content:flex-start!important}
+ .modal-details h2{font-size:27px!important;margin:8px 0}
+ .sale-price{font-size:19px}
+ .product-browse{margin-bottom:10px}
+ .modal-close{right:12px!important;top:10px!important}
+}
