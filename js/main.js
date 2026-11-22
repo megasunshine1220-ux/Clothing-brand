@@ -32,7 +32,7 @@ function showDirectory() {
     button.setAttribute("aria-pressed", "false");
   });
   scrollProgress = 1;
-  showroom.setProgress(1);
+  try { showroom.setProgress(1); } catch (error) { console.error(error); }
   $("#welcome-panel").classList.add("hidden");
   $("#entrance-directory").classList.add("visible");
   $("#product-stage").classList.remove("visible");
@@ -43,6 +43,12 @@ function showDirectory() {
 function enter() {
   if (!entered) showDirectory();
 }
+
+window.navigateToDepartment = choose;
+window.navigateToMain = () => {
+  showDirectory();
+  $("#department-title").textContent = "THE AURÉ BOUTIQUE";
+};
 
 function renderProducts() {
   const list = products.filter((item) => {
@@ -73,9 +79,6 @@ function choose(name) {
   entered = true;
   scrollProgress = 1;
   department = name;
-  showroom.setProgress(1);
-  showroom.setDepartment(name);
-
   $("#welcome-panel").classList.add("hidden");
   $("#entrance-directory").classList.remove("visible");
   $("#inside-title").classList.add("visible");
@@ -90,6 +93,12 @@ function choose(name) {
   });
 
   renderProducts();
+  try {
+    showroom.setProgress(1);
+    showroom.setDepartment(name);
+  } catch (error) {
+    console.error("3D department transition failed:", error);
+  }
 }
 
 function openProduct(id) {
@@ -169,14 +178,11 @@ document.addEventListener("click", (event) => {
 });
 
 $("#enter-shop").addEventListener("click", enter);
-$("#main-shop").addEventListener("click", () => {
-  showDirectory();
-  $("#department-title").textContent = "THE AURÉ BOUTIQUE";
-});
+$("#main-shop").addEventListener("click", window.navigateToMain);
 
 $("#back-departments").addEventListener("click", () => {
   $("#product-stage").classList.remove("visible");
-  showroom.clearDepartment();
+  try { showroom.clearDepartment(); } catch (error) { console.error(error); }
   $("#entrance-directory").classList.add("visible");
   $("#world-status").textContent = "02 — INSIDE THE AURÉ BOUTIQUE";
   document.querySelectorAll("[data-department]").forEach((button) => {
@@ -190,8 +196,7 @@ $("#brand-home").addEventListener("click", (event) => {
   entered = false;
   department = "All";
   scrollProgress = 0;
-  showroom.clearDepartment();
-  showroom.setProgress(0);
+  try { showroom.clearDepartment(); showroom.setProgress(0); } catch (error) { console.error(error); }
   $("#welcome-panel").classList.remove("hidden");
   $("#entrance-directory").classList.remove("visible");
   $("#product-stage").classList.remove("visible");
