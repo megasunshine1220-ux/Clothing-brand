@@ -94,7 +94,10 @@ function renderProduct() {
   $("#modal-image").src = activeProduct.image;
   $("#modal-image").alt = activeProduct.name;
   $("#modal-name").textContent = activeProduct.name;
-  $("#modal-price").textContent = money(activeProduct.price);
+  $("#modal-price").innerHTML = '<span class="sale-price">' + money(activeProduct.price) + '</span>' +
+    '<del class="original-price">' + money(activeProduct.mrp) + '</del>' +
+    '<span class="discount-chip">' + activeProduct.discountPercent + '% OFF</span>' +
+    '<small class="pricing-note">Illustrative offer pricing for this prototype.</small>';
   $("#modal-category").textContent = activeProduct.category + " / AURÉ EDIT";
   $("#modal-description").textContent = activeProduct.description;
   const quality = activeProduct.quality || {};
