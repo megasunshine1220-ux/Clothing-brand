@@ -10,6 +10,8 @@ const money = (value) => new Intl.NumberFormat("en-IN", {
 let entered = false;
 let department = "All";
 let activeProduct = null;
+let productSequence = [];
+let productIndex = 0;
 let scrollProgress = 0;
 let touchY = null;
 let toastTimer;
@@ -48,7 +50,16 @@ function enter() {
 window.navigateToDepartment = choose;
 window.navigateToMain = () => {
   showDirectory();
-  
+  department = "All";
+  showroom.clearDepartment();
+  showroom.setProgress(1);
+  scrollProgress = 1;
+  showFloorDirectory(false);
+  document.querySelectorAll("[data-department]").forEach(button => {
+    button.classList.remove("active");
+    button.setAttribute("aria-pressed", "false");
+  });
+  $("#world-status").textContent = "02 — AURÉ CENTRAL GALLERY";
 };
 
 function choose(name) {
@@ -68,16 +79,24 @@ function choose(name) {
   showroom.setDepartment(name);
 }
 
-function openProduct(id) {
-  activeProduct = products.find((item) => item.id === id);
-  if (!activeProduct) return;
+function productsForCurrentDepartment() {
+  if (department === "Men" || department === "Women") {
+    return products.filter(item => item.category === department);
+  }
+  if (department === "All") return products;
+  if (department === "Essentials") return products.filter(item => item.category === "Essentials");
+  return products.filter(item => item.type === department);
+}
 
+function renderProduct() {
+  activeProduct = productSequence[productIndex];
+  if (!activeProduct) return;
   $("#modal-image").src = activeProduct.image;
+  $("#modal-image").alt = activeProduct.name;
   $("#modal-name").textContent = activeProduct.name;
   $("#modal-price").textContent = money(activeProduct.price);
   $("#modal-category").textContent = activeProduct.category + " / AURÉ EDIT";
   $("#modal-description").textContent = activeProduct.description;
-
   const quality = activeProduct.quality || {};
   $("#modal-quality").innerHTML =
     '<div class="quality-heading"><span>FABRIC & CONSTRUCTION</span><small>DEMO SPECIFICATION</small></div>' +
@@ -87,10 +106,30 @@ function openProduct(id) {
       .map(([label, value]) => `<div class="quality-row"><span>${label}</span><strong>${value || "To be confirmed"}</strong></div>`)
       .join("") +
     '<p class="quality-note">Illustrative demo details, not verified supplier or laboratory claims.</p>';
-
   $("#modal-size").value = "";
+  $("#product-position").textContent = (productIndex + 1) + " / " + productSequence.length;
+  $("#product-prev").disabled = productSequence.length < 2;
+  $("#product-next").disabled = productSequence.length < 2;
+}
+
+function openProduct(id) {
+  productSequence = productsForCurrentDepartment();
+  let found = productSequence.findIndex(item => item.id === id);
+  if (found < 0) {
+    productSequence = products;
+    found = productSequence.findIndex(item => item.id === id);
+  }
+  if (found < 0) return;
+  productIndex = found;
+  renderProduct();
   $("#product-modal").classList.add("open");
   document.body.classList.add("lock");
+}
+
+function stepProduct(direction) {
+  if (!productSequence.length) return;
+  productIndex = (productIndex + direction + productSequence.length) % productSequence.length;
+  renderProduct();
 }
 
 function closeProduct() {
@@ -219,6 +258,9 @@ function closeBag() {
 }
 $("#bag-close").addEventListener("click", closeBag);
 $("#drawer-backdrop").addEventListener("click", closeBag);
+
+$("#product-prev").addEventListener("click", () => stepProduct(-1));
+$("#product-next").addEventListener("click", () => stepProduct(1));
 
 $("#modal-add").addEventListener("click", () => {
   const size = $("#modal-size").value;
