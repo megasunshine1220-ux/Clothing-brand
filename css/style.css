@@ -15,3 +15,15 @@
 .entrance-signs button{cursor:pointer}
 .entrance-signs button:focus-visible,.main-nav a:focus-visible,.filter:focus-visible{outline:2px solid #c69a80;outline-offset:4px}
 @media(max-width:600px){.site-header{position:sticky;top:0;display:grid;grid-template-columns:1fr auto;grid-template-rows:auto auto;height:auto;min-height:0;padding:10px 5vw 0}.main-nav{display:flex;position:static;grid-column:1/-1;grid-row:2;overflow-x:auto;justify-content:flex-start;gap:18px;padding:12px 0;background:var(--paper);white-space:nowrap}.main-nav a{flex:0 0 auto;font-size:8px}.products-wrap{scroll-margin-top:115px}}
+
+/* AURÉ lighting upgrade: brighter stone, visible garments and warm gallery spotlights */
+.journey-sticky{background:#30271f}
+.scene-vignette{background:linear-gradient(90deg,#100d0ab0,#100d0a36 48%,#100d0a08),linear-gradient(0deg,#100d0a32,transparent 32%)}
+.entrance-signs{background:linear-gradient(135deg,#35291fef,#211a15ed);border-color:#d7ad7c;box-shadow:0 18px 65px #0008,0 0 28px #e0ad6a25}
+.entrance-signs button:hover{background:#e8c89b18}
+.product-photo{background:#e1d8cb}
+.product-photo img{object-position:center top}
+.product-label{box-shadow:0 2px 10px #00000012}
+.product-info{align-items:flex-start}
+.product-price{font-weight:600}
+@media(min-width:1000px){.product-photo{height:420px}}
