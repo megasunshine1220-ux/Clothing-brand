@@ -253,23 +253,23 @@ export function createShowroom(canvas) {
     activeDepartment=name;
     // Move through the corresponding side opening and settle inside the room.
     roomTargetX=d.side*12.0;
-    roomTargetZ=d.z+1.7;
+    roomTargetZ=d.z+4.0;
   };
   const clearDepartment=()=>{activeDepartment=null;roomTargetX=0;roomTargetZ=-5;};
   const animate=()=>{
     raf=requestAnimationFrame(animate);
     progress=THREE.MathUtils.damp(progress,progressTarget,3.2,1/60);
-    roomX=THREE.MathUtils.damp(roomX,roomTargetX,2.4,1/60);
-    roomZ=THREE.MathUtils.damp(roomZ,roomTargetZ,2.4,1/60);
+    roomX=THREE.MathUtils.damp(roomX,roomTargetX,5.0,1/60);
+    roomZ=THREE.MathUtils.damp(roomZ,roomTargetZ,5.0,1/60);
     const doorOpen=THREE.MathUtils.smoothstep(progress,.04,.42);
     doors.forEach(({pivot,side})=>{pivot.rotation.y=side*doorOpen*1.16;});
     const corridorZ=18-progress*22;
     const targetX=activeDepartment?roomX:0;
     const targetZ=activeDepartment?roomZ:corridorZ;
-    camera.position.x=THREE.MathUtils.damp(camera.position.x,targetX,2.8,1/60);
+    camera.position.x=THREE.MathUtils.damp(camera.position.x,targetX,5.0,1/60);
     camera.position.y=THREE.MathUtils.damp(camera.position.y,2.35,3,1/60);
-    camera.position.z=THREE.MathUtils.damp(camera.position.z,targetZ,2.8,1/60);
-    camera.lookAt(activeDepartment?roomX:0,2.1,activeDepartment?roomZ-4:corridorZ-8);
+    camera.position.z=THREE.MathUtils.damp(camera.position.z,targetZ,5.0,1/60);
+    camera.lookAt(activeDepartment?roomX:0,2.1,activeDepartment?roomZ-5.2:corridorZ-8);
     renderer.render(scene,camera);
   };
   animate();
