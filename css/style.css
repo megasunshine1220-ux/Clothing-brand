@@ -45,3 +45,14 @@
 }
 /* Garments are modeled geometry, not image planes. Give them enough visual contrast. */
 #showroom-canvas{background:#e9e3d9}
+
+
+/* Product detail browsing controls */
+.product-browse{display:flex;align-items:center;justify-content:space-between;gap:8px;margin:0 0 18px;padding-bottom:12px;border-bottom:1px solid #d8cec1}
+.product-browse button{border:1px solid #cbbba7;background:#fff;color:#34291f;padding:9px 11px;font-size:8px;letter-spacing:.1em;white-space:nowrap}
+.product-browse button:hover:not(:disabled){background:#eadbc8}
+.product-browse button:disabled{opacity:.4;cursor:not-allowed}
+.product-browse span{font-size:9px;color:#82796d;font-variant-numeric:tabular-nums}
+.modal-details{min-width:0}
+.modal-card>img{object-fit:contain;background:#fff}
+@media(max-width:600px){.product-browse{margin-bottom:12px}.product-browse button{padding:8px;font-size:7px}}
