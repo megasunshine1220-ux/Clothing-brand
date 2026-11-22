@@ -142,17 +142,6 @@ document.addEventListener("click", (event) => {
 $("#enter-shop").addEventListener("click", enter);
 $("#main-shop").addEventListener("click", window.navigateToMain);
 
-$("#back-departments").addEventListener("click", () => {
-  
-  try { showroom.clearDepartment(); } catch (error) { console.error(error); }
-  
-  $("#world-status").textContent = "02 — INSIDE THE AURÉ BOUTIQUE";
-  document.querySelectorAll("[data-department]").forEach((button) => {
-    button.classList.remove("active");
-    button.setAttribute("aria-pressed", "false");
-  });
-});
-
 $("#brand-home").addEventListener("click", (event) => {
   event.preventDefault();
   entered = false;
