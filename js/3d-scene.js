@@ -193,6 +193,22 @@ export function createShowroom(canvas) {
     addBox(.12,6.4,.12,brass,cx+4.9,3.2,cz-5.65);
     addBox(9.9,.12,.12,brass,cx,6.4,cz-5.65);
     addSign(name+"  COLLECTION",cx,5.55,cz-5.48,4.7);
+    // Large editorial campaign portrait panels use real Indian fashion photography.
+    const campaignUrl = (name==="Women" || name==="Dresses")
+      ? "https://images.unsplash.com/photo-1666160525588-95294b909229?auto=format&fit=crop&w=900&q=85"
+      : "https://images.unsplash.com/photo-1617137968427-85924c800a22?auto=format&fit=crop&w=900&q=85";
+    const portraitMaterial = new THREE.MeshStandardMaterial({color:0xe8dfd3,roughness:.8});
+    const portrait = new THREE.Mesh(new THREE.PlaneGeometry(2.55,3.35),portraitMaterial);
+    portrait.position.set(cx,3.35,cz-5.66); scene.add(portrait);
+    addBox(2.72,3.52,.10,brass,cx,3.35,cz-5.76,{castShadow:false});
+    const portraitLoader = new THREE.TextureLoader();
+    portraitLoader.setCrossOrigin("anonymous");
+    portraitLoader.load(campaignUrl,texture=>{
+      texture.colorSpace=THREE.SRGBColorSpace;
+      portrait.material.map=texture;
+      portrait.material.color.set(0xffffff);
+      portrait.material.needsUpdate=true;
+    },undefined,()=>{});
     // Timber display plinths and illuminated shelving.
     for (const xx of [-4.1,4.1]) {
       addBox(1.35,.18,1.25,oak,cx+xx,.5,cz-3.5);
