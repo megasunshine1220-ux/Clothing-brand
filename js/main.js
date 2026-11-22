@@ -26,21 +26,23 @@ function toast(message) {
 function showFloorDirectory(visible) { const panel=$("#floor-directory"); panel.classList.toggle("visible",visible); panel.setAttribute("aria-hidden",visible?"false":"true"); }
 
 function showDirectory() {
+  // Enter the shop gradually. Do not jump past the glass entrance doors.
   entered = true;
   department = "All";
   document.querySelectorAll("[data-department]").forEach(button => {
     button.classList.remove("active");
     button.setAttribute("aria-pressed", "false");
   });
-  scrollProgress = 1;
-  showroom.setProgress(1);
-  showroom.clearDepartment();
   $("#welcome-panel").classList.add("hidden");
-  $("#world-status").textContent = "02 — INSIDE THE AURÉ BOUTIQUE";
+  $("#world-status").textContent = "02 — WALK THROUGH THE AURÉ ENTRANCE";
 }
 
 function enter() {
-  if (!entered) showDirectory();
+  if (entered) return;
+  entered = true;
+  scrollProgress = 0.48;
+  showroom.setProgress(scrollProgress);
+  showDirectory();
 }
 
 window.navigateToDepartment = choose;
