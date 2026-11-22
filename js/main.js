@@ -1,8 +1,268 @@
-import {createShowroom} from "./3d-scene.js";import{products}from"./products.js";import{createCart}from"./cart.js";const $=s=>document.querySelector(s),money=n=>new Intl.NumberFormat("en-IN",{style:"currency",currency:"INR",maximumFractionDigits:0}).format(n);let entered=false,department="All",activeProduct=null,timer;const showroom=createShowroom($("#showroom-canvas"));function toast(t){$("#toast").textContent=t;$("#toast").classList.add("show");clearTimeout(timer);timer=setTimeout(()=>$("#toast").classList.remove("show"),2200)}function enter(){if(entered)return;entered=true;showroom.setProgress(1);$("#welcome-panel").classList.add("hidden");$("#entrance-directory").classList.add("visible");$("#inside-title").classList.add("visible");$("#world-status").textContent="02 — INSIDE THE AURÉ BOUTIQUE"}function choose(d){if(!["Men","Women","Dresses","Tops","Bottoms","Essentials"].includes(d))return;entered=true;scrollProgress=1;showroom.setProgress(1);$("#welcome-panel").classList.add("hidden");$("#entrance-directory").classList.add("visible");$("#inside-title").classList.add("visible");$("#world-status").textContent="02 — INSIDE THE AURÉ BOUTIQUE";department=d;showroom.setDepartment(d);$("#department-title").textContent=d.toUpperCase()+" DEPARTMENT";$("#stage-heading").textContent=d+" collection";$("#entrance-directory").classList.remove("visible");$("#product-stage").classList.add("visible");$("#world-status").textContent="03 — "+d.toUpperCase()+" COLLECTION";document.querySelectorAll("[data-department]").forEach(b=>b.classList.toggle("active",b.dataset.department===d));render()}function render(){const list=products.filter(p=>department==="Men"||department==="Women"?p.category===department:department==="Essentials"?p.category==="Essentials":p.type===department);$("#product-grid").innerHTML=list.map(p=>`<article class="stage-product"><button class="stage-image" data-product="${p.id}"><img src="${p.image}" alt="${p.name}"><span>VIEW DETAILS ↗</span></button><div class="stage-product-meta"><div><strong>${p.name}</strong><small>${p.kind}</small></div><b>${money(p.price)}</b></div><button class="stage-quick-add" data-add="${p.id}">QUICK ADD +</button></article>`).join("")||"<p>No products in this department.</p>"}const cart=createCart({onChange:bag});function bag(){ $("#bag-count").textContent=cart.count();$("#drawer-count").textContent="("+cart.count()+")";$("#bag-subtotal").textContent=money(cart.total());$("#bag-items").innerHTML=cart.items.length?cart.items.map(i=>`<div class="bag-row"><img src="${i.image}"><div><strong>${i.name}</strong><p>Size: ${i.size} · Qty: ${i.quantity}</p><strong>${money(i.price*i.quantity)}</strong></div><button data-remove="${i.id}" data-size="${i.size}">REMOVE</button></div>`).join(""):'<div class="empty-bag">Your bag is empty.</div>'}function product(id){activeProduct=products.find(p=>p.id===id);if(!activeProduct)return;$("#modal-image").src=activeProduct.image;$("#modal-name").textContent=activeProduct.name;$("#modal-price").textContent=money(activeProduct.price);$("#modal-category").textContent=activeProduct.category+" / AURÉ EDIT";$("#modal-description").textContent=activeProduct.description;const q=activeProduct.quality||{};$("#modal-quality").innerHTML='<div class="quality-heading"><span>FABRIC & CONSTRUCTION</span><small>DEMO SPECIFICATION</small></div>'+[["Fabric",q.fabric],["Yarn / thread",q.yarn],["Weave",q.weave],["Feel",q.feel],["Weight",q.weight],["Finish",q.finish],["Fit",q.fit],["Care",q.care]].map(([a,b])=>`<div class="quality-row"><span>${a}</span><strong>${b||"To be confirmed"}</strong></div>`).join("")+'<p class="quality-note">Illustrative demo details, not verified supplier or laboratory claims.</p>';$("#modal-size").value="";$("#product-modal").classList.add("open");document.body.classList.add("lock")}function closeProduct(){$("#product-modal").classList.remove("open");document.body.classList.remove("lock")}document.addEventListener("click",e=>{const d=e.target.closest("[data-department]");if(d){e.preventDefault();choose(d.dataset.department);return}const p=e.target.closest("[data-product]");if(p){product(Number(p.dataset.product));return}const a=e.target.closest("[data-add]");if(a){const item=products.find(x=>x.id===Number(a.dataset.add));if(item){cart.add(item,"M");toast("Added to bag · size M")}return}if(e.target.closest("[data-close-modal]"))closeProduct();const r=e.target.closest("[data-remove]");if(r)cart.remove(Number(r.dataset.remove),r.dataset.size)});$("#enter-shop").addEventListener("click",enter);$("#back-departments").addEventListener("click",()=>{$("#product-stage").classList.remove("visible");showroom.clearDepartment();$("#entrance-directory").classList.add("visible")});$("#brand-home").addEventListener("click",e=>{e.preventDefault();entered=false;department="All";scrollProgress=0;showroom.clearDepartment();showroom.setProgress(0);$("#welcome-panel").classList.remove("hidden");$("#entrance-directory").classList.remove("visible");$("#product-stage").classList.remove("visible");$("#inside-title").classList.remove("visible");$("#world-status").textContent="01 — OUTSIDE THE AURÉ BOUTIQUE";document.querySelectorAll("[data-department]").forEach(b=>b.classList.remove("active"))});let scrollProgress=0,touchY=null;
-function driveScroll(delta){if(Math.abs(delta)<2)return;scrollProgress=Math.max(0,Math.min(1,scrollProgress+delta/850));showroom.setProgress(scrollProgress);if(scrollProgress>.28){if(!entered){entered=true;$("#welcome-panel").classList.add("hidden");$("#entrance-directory").classList.add("visible");$("#inside-title").classList.add("visible");$("#world-status").textContent="02 — INSIDE THE AURÉ BOUTIQUE";}}else if(scrollProgress<=.08){entered=false;$("#welcome-panel").classList.remove("hidden");$("#entrance-directory").classList.remove("visible");$("#product-stage").classList.remove("visible");$("#inside-title").classList.remove("visible");$("#world-status").textContent="01 — OUTSIDE THE AURÉ BOUTIQUE";}}
-window.addEventListener("wheel",e=>{if(!$("#bag-drawer").classList.contains("open")&&!$("#product-modal").classList.contains("open")){e.preventDefault();driveScroll(e.deltaY)}},{passive:false});
-window.addEventListener("touchstart",e=>{touchY=e.touches[0].clientY},{passive:true});
-window.addEventListener("touchmove",e=>{if(touchY!==null&&!$("#bag-drawer").classList.contains("open")&&!$("#product-modal").classList.contains("open")){const y=e.touches[0].clientY;driveScroll(touchY-y);touchY=y;e.preventDefault()}},{passive:false});
-window.addEventListener("touchend",()=>touchY=null,{passive:true});
-window.addEventListener("keydown",e=>{if(["ArrowDown","PageDown"," "].includes(e.key)&&!$("#product-modal").classList.contains("open")){driveScroll(.22*850)}else if(["ArrowUp","PageUp"].includes(e.key)){driveScroll(-.22*850)}});
-$("#bag-open").addEventListener("click",()=>{$("#bag-drawer").classList.add("open");$("#drawer-backdrop").classList.add("open");document.body.classList.add("lock")});function closeBag(){$("#bag-drawer").classList.remove("open");$("#drawer-backdrop").classList.remove("open");document.body.classList.remove("lock")}$("#bag-close").addEventListener("click",closeBag);$("#drawer-backdrop").addEventListener("click",closeBag);$("#modal-add").addEventListener("click",()=>{const s=$("#modal-size").value;if(!s){toast("Select a size first");return}cart.add(activeProduct,s);closeProduct();toast("Added to bag")});$("#checkout-button").addEventListener("click",()=>toast("Demo checkout — payment not connected"));document.addEventListener("keydown",e=>{if(e.key==="Escape"){closeBag();closeProduct()}});bag();
+import { createShowroom } from "./3d-scene.js";
+import { products } from "./products.js";
+import { createCart } from "./cart.js";
+
+const $ = (selector) => document.querySelector(selector);
+const money = (value) => new Intl.NumberFormat("en-IN", {
+  style: "currency", currency: "INR", maximumFractionDigits: 0
+}).format(value);
+
+let entered = false;
+let department = "All";
+let activeProduct = null;
+let scrollProgress = 0;
+let touchY = null;
+let toastTimer;
+
+const showroom = createShowroom($("#showroom-canvas"));
+
+function toast(message) {
+  $("#toast").textContent = message;
+  $("#toast").classList.add("show");
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => $("#toast").classList.remove("show"), 2200);
+}
+
+function showDirectory() {
+  entered = true;
+  scrollProgress = 1;
+  showroom.setProgress(1);
+  $("#welcome-panel").classList.add("hidden");
+  $("#entrance-directory").classList.add("visible");
+  $("#product-stage").classList.remove("visible");
+  $("#inside-title").classList.add("visible");
+  $("#world-status").textContent = "02 — INSIDE THE AURÉ BOUTIQUE";
+}
+
+function enter() {
+  if (!entered) showDirectory();
+}
+
+function renderProducts() {
+  const list = products.filter((item) => {
+    if (department === "Men" || department === "Women") return item.category === department;
+    if (department === "Essentials") return item.category === "Essentials";
+    return item.type === department;
+  });
+
+  $("#product-grid").innerHTML = list.map((item) => `
+    <article class="stage-product">
+      <button class="stage-image" data-product="${item.id}" aria-label="View ${item.name}">
+        <img src="${item.image}" alt="${item.name}" loading="lazy">
+        <span>VIEW DETAILS ↗</span>
+      </button>
+      <div class="stage-product-meta">
+        <div><strong>${item.name}</strong><small>${item.kind}</small></div>
+        <b>${money(item.price)}</b>
+      </div>
+      <button class="stage-quick-add" data-add="${item.id}">QUICK ADD +</button>
+    </article>
+  `).join("") || '<p class="empty-collection">New pieces are being prepared for this collection.</p>';
+}
+
+function choose(name) {
+  const valid = ["Men", "Women", "Dresses", "Tops", "Bottoms", "Essentials"];
+  if (!valid.includes(name)) return;
+
+  entered = true;
+  scrollProgress = 1;
+  department = name;
+  showroom.setProgress(1);
+  showroom.setDepartment(name);
+
+  $("#welcome-panel").classList.add("hidden");
+  $("#entrance-directory").classList.remove("visible");
+  $("#inside-title").classList.add("visible");
+  $("#department-title").textContent = name.toUpperCase() + " DEPARTMENT";
+  $("#stage-heading").textContent = name + " collection";
+  $("#product-stage").classList.add("visible");
+  $("#world-status").textContent = "03 — " + name.toUpperCase() + " COLLECTION";
+
+  document.querySelectorAll("[data-department]").forEach((button) => {
+    button.classList.toggle("active", button.dataset.department === name);
+    button.setAttribute("aria-pressed", button.dataset.department === name ? "true" : "false");
+  });
+
+  renderProducts();
+}
+
+function openProduct(id) {
+  activeProduct = products.find((item) => item.id === id);
+  if (!activeProduct) return;
+
+  $("#modal-image").src = activeProduct.image;
+  $("#modal-name").textContent = activeProduct.name;
+  $("#modal-price").textContent = money(activeProduct.price);
+  $("#modal-category").textContent = activeProduct.category + " / AURÉ EDIT";
+  $("#modal-description").textContent = activeProduct.description;
+
+  const quality = activeProduct.quality || {};
+  $("#modal-quality").innerHTML =
+    '<div class="quality-heading"><span>FABRIC & CONSTRUCTION</span><small>DEMO SPECIFICATION</small></div>' +
+    [["Fabric", quality.fabric], ["Yarn / thread", quality.yarn], ["Weave", quality.weave],
+      ["Feel", quality.feel], ["Weight", quality.weight], ["Finish", quality.finish],
+      ["Fit", quality.fit], ["Care", quality.care]]
+      .map(([label, value]) => `<div class="quality-row"><span>${label}</span><strong>${value || "To be confirmed"}</strong></div>`)
+      .join("") +
+    '<p class="quality-note">Illustrative demo details, not verified supplier or laboratory claims.</p>';
+
+  $("#modal-size").value = "";
+  $("#product-modal").classList.add("open");
+  document.body.classList.add("lock");
+}
+
+function closeProduct() {
+  $("#product-modal").classList.remove("open");
+  document.body.classList.remove("lock");
+}
+
+let cart;
+function updateBag() {
+  $("#bag-count").textContent = cart.count();
+  $("#drawer-count").textContent = "(" + cart.count() + ")";
+  $("#bag-subtotal").textContent = money(cart.total());
+  $("#bag-items").innerHTML = cart.items.length
+    ? cart.items.map((item) => `
+      <div class="bag-row">
+        <img src="${item.image}" alt="">
+        <div><strong>${item.name}</strong><p>Size: ${item.size} · Qty: ${item.quantity}</p>
+          <strong>${money(item.price * item.quantity)}</strong></div>
+        <button data-remove="${item.id}" data-size="${item.size}">REMOVE</button>
+      </div>`).join("")
+    : '<div class="empty-bag">Your bag is empty.</div>';
+}
+cart = createCart({ onChange: updateBag });
+
+document.querySelectorAll("[data-department]").forEach((button) => {
+  button.addEventListener("click", (event) => {
+    event.preventDefault();
+    choose(button.dataset.department);
+  });
+});
+
+document.addEventListener("click", (event) => {
+  const productButton = event.target.closest("[data-product]");
+  if (productButton) {
+    openProduct(Number(productButton.dataset.product));
+    return;
+  }
+
+  const addButton = event.target.closest("[data-add]");
+  if (addButton) {
+    const item = products.find((product) => product.id === Number(addButton.dataset.add));
+    if (item) {
+      cart.add(item, "M");
+      toast("Added to bag · size M");
+    }
+    return;
+  }
+
+  const removeButton = event.target.closest("[data-remove]");
+  if (removeButton) cart.remove(Number(removeButton.dataset.remove), removeButton.dataset.size);
+  if (event.target.closest("[data-close-modal]")) closeProduct();
+});
+
+$("#enter-shop").addEventListener("click", enter);
+
+$("#back-departments").addEventListener("click", () => {
+  $("#product-stage").classList.remove("visible");
+  showroom.clearDepartment();
+  $("#entrance-directory").classList.add("visible");
+  $("#world-status").textContent = "02 — INSIDE THE AURÉ BOUTIQUE";
+  document.querySelectorAll("[data-department]").forEach((button) => {
+    button.classList.remove("active");
+    button.setAttribute("aria-pressed", "false");
+  });
+});
+
+$("#brand-home").addEventListener("click", (event) => {
+  event.preventDefault();
+  entered = false;
+  department = "All";
+  scrollProgress = 0;
+  showroom.clearDepartment();
+  showroom.setProgress(0);
+  $("#welcome-panel").classList.remove("hidden");
+  $("#entrance-directory").classList.remove("visible");
+  $("#product-stage").classList.remove("visible");
+  $("#inside-title").classList.remove("visible");
+  $("#world-status").textContent = "01 — OUTSIDE THE AURÉ BOUTIQUE";
+  document.querySelectorAll("[data-department]").forEach((button) => {
+    button.classList.remove("active");
+    button.setAttribute("aria-pressed", "false");
+  });
+});
+
+function driveScroll(delta) {
+  if (Math.abs(delta) < 2 || $("#product-stage").classList.contains("visible")) return;
+  scrollProgress = Math.max(0, Math.min(1, scrollProgress + delta / 850));
+  showroom.setProgress(scrollProgress);
+
+  if (scrollProgress > .28) {
+    if (!entered) showDirectory();
+  } else if (scrollProgress <= .08) {
+    entered = false;
+    $("#welcome-panel").classList.remove("hidden");
+    $("#entrance-directory").classList.remove("visible");
+    $("#inside-title").classList.remove("visible");
+    $("#world-status").textContent = "01 — OUTSIDE THE AURÉ BOUTIQUE";
+  }
+}
+
+window.addEventListener("wheel", (event) => {
+  if (!$("#bag-drawer").classList.contains("open") && !$("#product-modal").classList.contains("open")) {
+    event.preventDefault();
+    driveScroll(event.deltaY);
+  }
+}, { passive: false });
+
+window.addEventListener("touchstart", (event) => { touchY = event.touches[0].clientY; }, { passive: true });
+window.addEventListener("touchmove", (event) => {
+  if (touchY === null || $("#bag-drawer").classList.contains("open") || $("#product-modal").classList.contains("open")) return;
+  const nextY = event.touches[0].clientY;
+  driveScroll(touchY - nextY);
+  touchY = nextY;
+  event.preventDefault();
+}, { passive: false });
+window.addEventListener("touchend", () => { touchY = null; }, { passive: true });
+
+window.addEventListener("keydown", (event) => {
+  if (["INPUT", "SELECT", "TEXTAREA"].includes(document.activeElement.tagName)) return;
+  if (["ArrowDown", "PageDown", " "].includes(event.key) && !$("#product-modal").classList.contains("open")) {
+    driveScroll(187);
+  } else if (["ArrowUp", "PageUp"].includes(event.key)) {
+    driveScroll(-187);
+  }
+});
+
+$("#bag-open").addEventListener("click", () => {
+  $("#bag-drawer").classList.add("open");
+  $("#drawer-backdrop").classList.add("open");
+  document.body.classList.add("lock");
+});
+
+function closeBag() {
+  $("#bag-drawer").classList.remove("open");
+  $("#drawer-backdrop").classList.remove("open");
+  document.body.classList.remove("lock");
+}
+$("#bag-close").addEventListener("click", closeBag);
+$("#drawer-backdrop").addEventListener("click", closeBag);
+
+$("#modal-add").addEventListener("click", () => {
+  const size = $("#modal-size").value;
+  if (!size) return toast("Select a size first");
+  cart.add(activeProduct, size);
+  closeProduct();
+  toast("Added to bag");
+});
+
+$("#checkout-button").addEventListener("click", () => toast("Demo checkout — payment not connected"));
+document.addEventListener("keydown", (event) => {
+  if (event.key === "Escape") {
+    closeBag();
+    closeProduct();
+  }
+});
+
+updateBag();
